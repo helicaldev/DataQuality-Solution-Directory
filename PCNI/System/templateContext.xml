@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<template>
+<name>New Report</name>
+<path>DataQualityReport/New Report</path>
+      <children>
+         <element>
+			<name>Report Templates - Data Quality</name>
+            <path>DataQualityReport/New Report/Report Templates - Data Quality</path>
+            <type>folder</type>
+            <children>
+               <element>
+				  <path>DataQualityReport/New Report/Report Templates - Data Quality</path>
+                  <author>RUPAM</author>
+                  <description>Template For Data Quality APR - DK n R Report</description>
+                  <extension>efw</extension>
+                  <icon>images/image.ico</icon>
+                  <style>clean</style>
+                  <template>dataquality_original.html</template>
+                  <title>Data Quality APR - DK n R</title>
+                  <type>file</type>
+                  <visible>true</visible>
+               </element>
+            </children>
+          </element>
+		 <element>
+            <children>
+               <element>
+			   <path>DataQualityReport/New Report/HelicalDemo</path>
+			   <type>file</type>
+                 <title>HDI Demo</title>
+				<author>Nitin</author>
+				<description>Demo Dashboard</description>
+				<icon>images/image.ico</icon>
+				<template>template.html</template>
+				<visible>true</visible> 
+				<style>clean</style>
+				<extension>efw</extension>
+				</element>
+            </children>
+            <name>Helical Demo</name>
+            <path>DataQualityReport/New Report/HelicalDemo</path>
+            <type>folder</type>
+         </element>
+		 <element>
+            <children>
+               <element>
+			   <path>DataQualityReport/New Report/jasperTest-Datasource</path>
+			   <type>file</type>
+                 <title>Jaser datasource Demo</title>
+				<author>Prashansa</author>
+				<description>Jasper datasource Dashboard</description>
+				<icon>images/image.ico</icon>
+				<template>template.html</template>
+				<visible>true</visible> 
+				<style>clean</style>
+				<extension>efw</extension>
+				</element>
+            </children>
+            <name>Jasper Demo</name>
+            <path>DataQualityReport/New Report/jasperTest-Datasource</path>
+            <type>folder</type>
+         </element>
+		 <element>
+            <children>
+               <element>
+			   <path>DataQualityReport/New Report/Crosstab</path>
+			   <type>file</type>
+                 <title>CrossTab Dashboard</title>
+				<author>nitin@helicaltech.com</author>
+				<description>Stage wise detailed information you can get it from this dashboard</description>
+				<icon>images/image.ico</icon>
+				<template>Chord_basic_view.html</template>
+				<visible>true</visible> 
+				<style>clean</style>
+				<extension>efw</extension>
+				</element>
+            </children>
+            <name>Crosstab</name>
+            <path>DataQualityReport/New Report/Crosstab</path>
+            <type>folder</type>
+         </element>
+      </children>
+	  
+</template>
