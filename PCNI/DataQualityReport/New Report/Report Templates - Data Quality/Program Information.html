@@ -270,7 +270,7 @@ color:black;
 }
 
 @media screen{
-    #projectSelector li:not(:first-child){
+    #projectSelector li:nth-child(n+3){
         display: none;
     }
 }
@@ -484,16 +484,8 @@ color:black;
 		dashboard.setVariable('hide_result','false');
         dashboard.setVariable('PKey',[]);
         dashboard.setVariable('recipients',[]);
-
-		var user_id = "${uid}";
-
-         if(user_id.indexOf("{uid}") >= 0){
-          dashboard.setVariable('uid',window.DashboardGlobals.sessionUserName);
-         }
-         else{
-          dashboard.setVariable('uid',user_id.replace(/'/g,'').split(','));
-         }
-		
+		dashboard.setVariable('uid',"'"+window.DashboardGlobals.sessionUserName+"'");
+		console.log(dashboard.getVariable('uid'));
         var f = "${format}";
 
          if(f.indexOf("{format}") >= 0){
@@ -551,7 +543,7 @@ color:black;
          var agency_key = "${Akey}";
 
          if(agency_key.indexOf("{Akey}") >= 0){
-          dashboard.setVariable('Akey',['82']);
+          dashboard.setVariable('Akey',['']);
          }
          else{
           dashboard.setVariable('Akey',agency_key.replace(/'/g,'').split(','));
@@ -560,7 +552,7 @@ color:black;
 		var coc_location = "${coc}";
 
          if(coc_location.indexOf("{coc}") >= 0){
-          dashboard.setVariable('coc',['1']);
+          dashboard.setVariable('coc',['']);
          }
          else{
           dashboard.setVariable('coc',coc_location.replace(/'/g,'').split(','));
@@ -569,7 +561,7 @@ color:black;
 		 var prj_type = "${CODE_KEY}";
 
          if(prj_type.indexOf("{CODE_KEY}") >= 0){
-          dashboard.setVariable('CODE_KEY',['1']);
+          dashboard.setVariable('CODE_KEY',['']);
          }
          else{
           dashboard.setVariable('CODE_KEY',prj_type.replace(/'/g,'').split(','));
@@ -588,7 +580,7 @@ color:black;
          var Project_Key = "${PKey}";
 
          if(Project_Key.indexOf("{PKey}") >= 0){
-          dashboard.setVariable('PKey',['3172']);
+          dashboard.setVariable('PKey',['']);
          }
          else{
           dashboard.setVariable('PKey',Project_Key.replace(/'/g,'').split(','));
@@ -668,7 +660,6 @@ color:black;
         if(projectNames.indexOf("{projectNames}") >= 0){
             dashboard.setVariable('projectNames',[]);
             projectNames = false;
-          console.log('no projectNames');
         } else {
             projectNames = projectNames.replace(/'/g,'').split(',');
             dashboard.setVariable('projectNames',projectNames);
@@ -697,14 +688,14 @@ var selectAgencyName = {
     name: "selectAgencyName",
     type:  "select2",
     parameters:["Akey"],
-	listeners : ["uid"],
+	listeners:["uid"],
     options:{
         multiple:true,
         value : 'Akey',
         display : 'Agency',
         placeholder: 'Select Agency'
     },
-	requestParameters : {
+	requestParameters:{
 	uid:"uid"
 	},
     htmlElementId : "#agency",
@@ -816,9 +807,13 @@ var dynaTable = {
     executeAtStart: false,
 	customScript: function(data)
 	{
-		//var data = jQuery.parseJSON(data);
-						console.log("Actual Data \n"+JSON.stringify(data));
-						
+			if(_.pluck(data, 'one')==1)
+			{
+					$('#wrap1').html("<div style='border:1px solid;'><h2 style='text-align:CENTER;color:#927333;'>No Data To Display</h2></div>");
+					return;
+		
+			}
+			else {
 					var drillDown = dashboard.setVariable('drillDown','false');
 						var data2 = [];
 						for(var i = 0; i< data.length; i++){
@@ -865,26 +860,24 @@ var dynaTable = {
 						  },features: {
 							pushState: false
 						  },
-						}).on('dynatable:sorts:added dynatable:sorts:removed', stylizeTable)
+						})
 						.data('dynatable');
 
 
 						$("#toolbar").removeClass('hidden');
 
-						function stylizeTable (){
 							$('#chart_4_table').find('td').each(function(){
 								var elem = $(this);
 								if( elem.is(':first-child') || elem.text() === '0' ) return; 
 								elem.css( {"text-decoration" : "underline", "cursor" : "pointer"}); 
 							});
-						}
-						
-						stylizeTable();
+
+						/*stylizeTable();
 
 						$('#chart_4_table').find('th').each(function(){
 						  if($(this).text().match('total'))
 						  $('#chart_4_table td:last-child').css("text-decoration", "none");
-						});
+						});*/
 						
 						$('#chart_4_table').on('click', 'td',function () {
 					  
@@ -903,6 +896,7 @@ var dynaTable = {
 						   }
 						   return false;
 						});
+         }
 	}
 };
 
@@ -1243,7 +1237,14 @@ var showReportMetaData = function() {
     var sDate = moment(Dashboard.getVariable('sDate'), 'YYYY-MM-DD').format("MM-DD-YYYY");
     var eDate = moment(Dashboard.getVariable('eDate'), 'YYYY-MM-DD').format("MM-DD-YYYY");
     $('#reportingPeriod').text( sDate+" - "+eDate);
-
+	/*projects = $('#project').find('input').select2('data');
+    Dashboard.setVariable('projectNames', _.pluck(projects, 'text'))
+	if(Dashboard.getVariable('projectNames').length <= 3) {
+	alert('inside if');
+	 $('#projectSelector').text(Dashboard.getVariable('projectNames'));
+	 }
+	 else {
+	 alert('inside else');*/
     var projectList = $('#projectSelector').find('ul').empty();
 
     $('#projectSelector').off();
@@ -1253,6 +1254,7 @@ var showReportMetaData = function() {
       }
     var projects = Dashboard.getVariable('projectNames');
         for (var i = 0; i < projects.length; i++){
+			console.log(projects.length);
             projectList.append("<li>" + projects[i] + "</li>");
         }
 
@@ -1260,6 +1262,7 @@ var showReportMetaData = function() {
             window.bootbox.alert(projects.join("<br>"));
             return false;
         })
+
 };
 
 
@@ -1361,6 +1364,7 @@ var saveProjects = {
         //if (projects == "" || projects.length < 1){
             projects = $('#project').find('input').select2('data');
             Dashboard.setVariable('projectNames', _.pluck(projects, 'text'))
+			
         //}
         //console.log(projects)
     },
