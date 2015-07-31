@@ -34,7 +34,7 @@ BEGIN
       C.CLIENT_KEY=PP.CLIENT_KEY AND
       P.PROJECT_KEY = PP.PROJECT_KEY AND
       A.AGENCY_KEY = P.AGENCY_KEY AND
-      (CR.RACE_CODE = CASE WHEN \'',resultsOpt,'\' = \'dk\' THEN 15
+      (CR.RACE_CODE = CASE WHEN \'',resultsOpt,'\' = \'Dont Know\' THEN 15
                      WHEN \'',resultsOpt,'\' = \'refused\' THEN 16
                      WHEN \'',resultsOpt,'\' = \'missing\' THEN \'\' OR CR.RACE_CODE is null
                      WHEN \'',resultsOpt,'\' = \'Totalapplicableclients\' THEN CR.RACE_CODE END) AND
@@ -51,7 +51,7 @@ BEGIN
       C.CLIENT_KEY = PP.CLIENT_KEY AND
       P.PROJECT_KEY = PP.PROJECT_KEY AND
       A.AGENCY_KEY = P.AGENCY_KEY AND
-      (C.GENDER_CODE = CASE WHEN \'',resultsOpt,'\' = \'dk\' THEN 8
+      (C.GENDER_CODE = CASE WHEN \'',resultsOpt,'\' = \'Dont Know\' THEN 8
                      WHEN \'',resultsOpt,'\' = \'refused\' THEN 9
                      WHEN \'',resultsOpt,'\' = \'missing\' THEN \'\' OR C.GENDER_CODE is null
                      WHEN \'',resultsOpt,'\' = \'Totalapplicableclients\' THEN C.GENDER_CODE END) AND
@@ -68,7 +68,7 @@ BEGIN
       C.CLIENT_KEY=PP.CLIENT_KEY AND
       P.PROJECT_KEY = PP.PROJECT_KEY AND
       A.AGENCY_KEY = P.AGENCY_KEY AND
-      (C.ETHNICITY_CODE = CASE WHEN \'',resultsOpt,'\' = \'dk\' THEN 8
+      (C.ETHNICITY_CODE = CASE WHEN \'',resultsOpt,'\' = \'Dont Know\' THEN 8
                      WHEN \'',resultsOpt,'\' = \'refused\' THEN 9
                      WHEN \'',resultsOpt,'\' = \'missing\' THEN \'\' OR C.ETHNICITY_CODE is null
                      WHEN \'',resultsOpt,'\' = \'Totalapplicableclients\' THEN C.ETHNICITY_CODE END) AND
@@ -85,7 +85,7 @@ BEGIN
       C.CLIENT_KEY=PP.CLIENT_KEY AND
       P.PROJECT_KEY = PP.PROJECT_KEY AND
       A.AGENCY_KEY = P.AGENCY_KEY AND
-      (C.VETERAN_STATUS_GCT = CASE WHEN \'',resultsOpt,'\' = \'dk\' THEN 8
+      (C.VETERAN_STATUS_GCT = CASE WHEN \'',resultsOpt,'\' = \'Dont Know\' THEN 8
                      WHEN \'',resultsOpt,'\' = \'refused\' THEN 9
                      WHEN \'',resultsOpt,'\' = \'missing\' THEN \'\' OR C.VETERAN_STATUS_GCT is null
                      WHEN \'',resultsOpt,'\' = \'Totalapplicableclients\' THEN C.VETERAN_STATUS_GCT END) AND
@@ -103,7 +103,7 @@ BEGIN
       P.PROJECT_KEY = PP.PROJECT_KEY AND
       A.AGENCY_KEY = P.AGENCY_KEY AND
       CGe.CODE_KEY = CDs.PHYSICAL_GCT AND
-      (CDs.PHYSICAL_GCT = CASE WHEN \'',resultsOpt,'\' = \'dk\' THEN 8
+      (CDs.PHYSICAL_GCT = CASE WHEN \'',resultsOpt,'\' = \'Dont Know\' THEN 8
                      WHEN \'',resultsOpt,'\' = \'refused\' THEN 9
                      WHEN \'',resultsOpt,'\' = \'missing\' THEN \'\' OR CDs.PHYSICAL_GCT is null
                      WHEN \'',resultsOpt,'\' = \'Totalapplicableclients\' THEN CDs.PHYSICAL_GCT END) AND
@@ -121,7 +121,7 @@ BEGIN
       P.PROJECT_KEY = PP.PROJECT_KEY AND
       A.AGENCY_KEY = P.AGENCY_KEY AND
       CGe.CODE_KEY = CDs.CHRONIC_HEALTH_COND_GCT AND
-      (CDs.CHRONIC_HEALTH_COND_GCT = CASE WHEN \'',resultsOpt,'\' = \'dk\' THEN 8
+      (CDs.CHRONIC_HEALTH_COND_GCT = CASE WHEN \'',resultsOpt,'\' = \'Dont Know\' THEN 8
                      WHEN \'',resultsOpt,'\' = \'refused\' THEN 9
                      WHEN \'',resultsOpt,'\' = \'missing\' THEN \'\' OR CDs.CHRONIC_HEALTH_COND_GCT is null
                      WHEN \'',resultsOpt,'\' = \'Totalapplicableclients\' THEN CDs.CHRONIC_HEALTH_COND_GCT END) AND
@@ -139,7 +139,7 @@ BEGIN
       P.PROJECT_KEY = PP.PROJECT_KEY AND
       A.AGENCY_KEY = P.AGENCY_KEY AND
       CGe.CODE_KEY = CDs.HIVAIDS_GCT AND
-      (CDs.HIVAIDS_GCT = CASE WHEN \'',resultsOpt,'\' = \'dk\' THEN 8
+      (CDs.HIVAIDS_GCT = CASE WHEN \'',resultsOpt,'\' = \'Dont Know\' THEN 8
                      WHEN \'',resultsOpt,'\' = \'refused\' THEN 9
                      WHEN \'',resultsOpt,'\' = \'missing\' THEN \'\' OR CDs.HIVAIDS_GCT is null
                      WHEN \'',resultsOpt,'\' = \'Totalapplicableclients\' THEN CDs.HIVAIDS_GCT END) AND
@@ -157,7 +157,7 @@ BEGIN
       P.PROJECT_KEY = PP.PROJECT_KEY AND
       A.AGENCY_KEY = P.AGENCY_KEY AND
       CGe.CODE_KEY = CDs.MENTAL_HEALTH_GCT AND
-      (CDs.MENTAL_HEALTH_GCT = CASE WHEN \'',resultsOpt,'\' = \'dk\' THEN 8
+      (CDs.MENTAL_HEALTH_GCT = CASE WHEN \'',resultsOpt,'\' = \'Dont Know\' THEN 8
                      WHEN \'',resultsOpt,'\' = \'refused\' THEN 9
                      WHEN \'',resultsOpt,'\' = \'missing\' THEN \'\' OR CDs.MENTAL_HEALTH_GCT is null
                      WHEN \'',resultsOpt,'\' = \'Totalapplicableclients\' THEN CDs.MENTAL_HEALTH_GCT END) AND
@@ -175,7 +175,7 @@ BEGIN
       P.PROJECT_KEY = PP.PROJECT_KEY AND
       A.AGENCY_KEY = P.AGENCY_KEY AND
       CGe.CODE_KEY = CDs.SUBSTANCE_ABUSE_CODE AND
-      (CDs.SUBSTANCE_ABUSE_CODE = CASE WHEN \'',resultsOpt,'\' = \'dk\' THEN 8
+      (CDs.SUBSTANCE_ABUSE_CODE = CASE WHEN \'',resultsOpt,'\' = \'Dont Know\' THEN 8
                      WHEN \'',resultsOpt,'\' = \'refused\' THEN 9
                      WHEN \'',resultsOpt,'\' = \'missing\' THEN \'\' OR CDs.SUBSTANCE_ABUSE_CODE is null
                      WHEN \'',resultsOpt,'\' = \'Totalapplicableclients\' THEN CDs.SUBSTANCE_ABUSE_CODE END) AND
@@ -193,7 +193,7 @@ BEGIN
       P.PROJECT_KEY = PP.PROJECT_KEY AND
       A.AGENCY_KEY = P.AGENCY_KEY AND
       CGe.CODE_KEY = CDs.DOMES_VIOLENCE_GCT AND
-      (CDs.DOMES_VIOLENCE_GCT = CASE WHEN \'',resultsOpt,'\' = \'dk\' THEN 8
+      (CDs.DOMES_VIOLENCE_GCT = CASE WHEN \'',resultsOpt,'\' = \'Dont Know\' THEN 8
                      WHEN \'',resultsOpt,'\' = \'refused\' THEN 9
                      WHEN \'',resultsOpt,'\' = \'missing\' THEN \'\' OR CDs.DOMES_VIOLENCE_GCT is null
                      WHEN \'',resultsOpt,'\' = \'Totalapplicableclients\' THEN CDs.DOMES_VIOLENCE_GCT END) AND
@@ -211,7 +211,7 @@ BEGIN
       C.CLIENT_KEY=PP.CLIENT_KEY AND
       P.PROJECT_KEY = PP.PROJECT_KEY AND
       A.AGENCY_KEY = P.AGENCY_KEY AND
-      (CH.HOUSEHOLD_KEY = CASE WHEN \'',resultsOpt,'\' = \'dk\' THEN 8
+      (CH.HOUSEHOLD_KEY = CASE WHEN \'',resultsOpt,'\' = \'Dont Know\' THEN 8
                      WHEN \'',resultsOpt,'\' = \'refused\' THEN 9
                      WHEN \'',resultsOpt,'\' = \'missing\' THEN \'\' OR CH.HOUSEHOLD_KEY is null
                      WHEN \'',resultsOpt,'\' = \'Totalapplicableclients\' THEN CH.HOUSEHOLD_KEY END) AND
@@ -229,7 +229,7 @@ BEGIN
       C.CLIENT_KEY=PP.CLIENT_KEY AND
       P.PROJECT_KEY = PP.PROJECT_KEY AND
       A.AGENCY_KEY = P.AGENCY_KEY AND
-      (C.DOB_TYPE_CODE = CASE WHEN \'',resultsOpt,'\' = \'dk\' THEN 8
+      (C.DOB_TYPE_CODE = CASE WHEN \'',resultsOpt,'\' = \'Dont Know\' THEN 8
                      WHEN \'',resultsOpt,'\' = \'refused\' THEN 4
                      WHEN \'',resultsOpt,'\' = \'missing\' THEN \'\' OR CDOB.CODE_KEY is null
                      WHEN \'',resultsOpt,'\' = \'Totalapplicableclients\' THEN C.DOB_TYPE_CODE END) AND
