@@ -22,8 +22,8 @@ BEGIN
        DECLARE a varchar(65535);
        DECLARE akey varchar(65535);
        DECLARE pkey varchar(65535);
-	   DECLARE type_code varchar(65535);
-	   DECLARE coc_key varchar(65535);
+	    DECLARE type_code varchar(65535);
+	    DECLARE coc_key varchar(65535);
        DECLARE rowId varchar(65535);
        DECLARE queryRace varchar(65535);
        DECLARE queryGender varchar(65535);
@@ -46,20 +46,14 @@ BEGIN
        DECLARE queryBenefitsEntry varchar(65535);
        DECLARE queryBenefitsExit varchar(65535);
        DECLARE innerQuery varchar(65535);
-       -- set a = REPLACE(param_cols,'\'','');
+       set a = REPLACE(param_cols,'\'','`');
        set akey = REPLACE(a_key,'\'','');
        set pkey = REPLACE(p_Key,'\'','');
 	    set type_code = REPLACE(project_type_code,'\'','');
 	    set coc_key = REPLACE(cockey,'\'','');
        set rowId = REPLACE(dataelemId,'\'','');
-       
        set innerQuery = '';
-		 IF a = "'*'" THEN 
-		 	set a = 'dk,Refused,Missing';
-		 	set a = REPLACE(a,'\'','');
-		 ELSE set a = REPLACE(param_cols,'\'','');
-		 END IF;
-       set queryRace = CONCAT('select dataelements,',a,' from (select z.dataelements,z.dk,z.Refused,z.Missing from(select \'Race\' as dataelements,PP.ENTRY_DATE,PP.EXIT_DATE,
+       set queryRace = CONCAT('select dataelements,',a,' from (select z.dataelements,z.dk as \'Dont Know\',z.Refused,z.Missing from(select \'Race\' as dataelements,PP.ENTRY_DATE,PP.EXIT_DATE,
       count(case when CR.RACE_CODE = 15 then CR.RACE_CODE end) as dk,
       count(case when CR.RACE_CODE = 16 then CR.RACE_CODE end) as Refused,
       count(case when (CR.RACE_CODE = \'\' or CR.RACE_CODE is null) then CR.RACE_CODE end) as Missing
@@ -78,7 +72,7 @@ BEGIN
       PP.ENTRY_DATE <= \'',endDate,'\' AND
       PP.EXIT_DATE >= \'',startDate,'\')z)b');
 
-      set queryGender = CONCAT('select distinct dataelements,',a,' from (select z.dataelements,z.dk,z.Refused,z.Missing,z.Totalapplicableclients,((z.dk+z.Refused+z.Missing)/z.Totalapplicableclients) as total from(select \'Gender\' as dataelements,PP.ENTRY_DATE,PP.EXIT_DATE,
+      set queryGender = CONCAT('select distinct dataelements,',a,' from (select z.dataelements,z.dk as \'Dont Know\',z.Refused,z.Missing,z.Totalapplicableclients,((z.dk+z.Refused+z.Missing)/z.Totalapplicableclients) as total from(select \'Gender\' as dataelements,PP.ENTRY_DATE,PP.EXIT_DATE,
       count(case when C.GENDER_CODE = 8 then C.GENDER_CODE end) as dk,
       count(case when C.GENDER_CODE = 9 then C.GENDER_CODE end) as Refused,
       count(case when (C.GENDER_CODE = \'\' or C.GENDER_CODE is null) then C.GENDER_CODE end) as Missing,
@@ -98,7 +92,7 @@ BEGIN
       PP.ENTRY_DATE <= \'',endDate,'\' AND
       PP.EXIT_DATE >= \'',startDate,'\')z)b');
 
-      set queryEthnicity = CONCAT('select distinct dataelements,',a,' from (select z.dataelements,z.dk,z.Refused,z.Missing,z.Totalapplicableclients,((z.dk+z.Refused+z.Missing)/z.Totalapplicableclients) as total from(select \'Ethnicity\' as dataelements,PP.ENTRY_DATE,PP.EXIT_DATE,
+      set queryEthnicity = CONCAT('select distinct dataelements,',a,' from (select z.dataelements,z.dk as \'Dont Know\',z.Refused,z.Missing,z.Totalapplicableclients,((z.dk+z.Refused+z.Missing)/z.Totalapplicableclients) as total from(select \'Ethnicity\' as dataelements,PP.ENTRY_DATE,PP.EXIT_DATE,
       count(case when C.ETHNICITY_CODE = 8 then C.ETHNICITY_CODE end) as dk,
       count(case when C.ETHNICITY_CODE = 9 then C.ETHNICITY_CODE end) as refused,
       count(case when (C.ETHNICITY_CODE = \'\' or C.ETHNICITY_CODE is null) then C.ETHNICITY_CODE end) as missing,
@@ -118,7 +112,7 @@ BEGIN
       PP.ENTRY_DATE <= \'',endDate,'\' AND
       PP.EXIT_DATE >= \'',startDate,'\')z)b');
 
-      set queryVetSts = CONCAT('select dataelements,',a,' from (select z.dataelements,z.dk,z.Refused,z.Missing,z.Totalapplicableclients,((z.dk+z.Refused+z.Missing)/z.Totalapplicableclients) as total from(select \'Veteran Status\' as dataelements,PP.ENTRY_DATE,PP.EXIT_DATE,
+      set queryVetSts = CONCAT('select dataelements,',a,' from (select z.dataelements,z.dk as \'Dont Know\',z.Refused,z.Missing,z.Totalapplicableclients,((z.dk+z.Refused+z.Missing)/z.Totalapplicableclients) as total from(select \'Veteran Status\' as dataelements,PP.ENTRY_DATE,PP.EXIT_DATE,
       count(case when C.VETERAN_STATUS_GCT = 8 then C.VETERAN_STATUS_GCT end) as dk,
       count(case when C.VETERAN_STATUS_GCT = 9 then C.VETERAN_STATUS_GCT end) as refused,
       count(case when C.VETERAN_STATUS_GCT = 99 then C.VETERAN_STATUS_GCT end) as missing,
@@ -138,7 +132,7 @@ BEGIN
       PP.ENTRY_DATE <= \'',endDate,'\' AND
       PP.EXIT_DATE >= \'',startDate,'\')z)b');
 
-      set queryPhyDis = CONCAT('select dataelements,',a,' from (select z.dataelements,z.dk,z.Refused,z.Missing,z.Totalapplicableclients,((z.dk+z.Refused+z.Missing)/z.Totalapplicableclients) as total from(select \'Physical Disability\' as dataelements,PP.ENTRY_DATE,PP.EXIT_DATE,
+      set queryPhyDis = CONCAT('select dataelements,',a,' from (select z.dataelements,z.dk as \'Dont Know\',z.Refused,z.Missing,z.Totalapplicableclients,((z.dk+z.Refused+z.Missing)/z.Totalapplicableclients) as total from(select \'Physical Disability\' as dataelements,PP.ENTRY_DATE,PP.EXIT_DATE,
       count(case when CDs.PHYSICAL_GCT = 8 then CDs.PHYSICAL_GCT end) as dk,
       count(case when CDs.PHYSICAL_GCT = 9 then CDs.PHYSICAL_GCT end) as refused,
       count(case when CDs.PHYSICAL_GCT = 99 then CDs.PHYSICAL_GCT end) as missing,
@@ -159,7 +153,7 @@ BEGIN
       PP.ENTRY_DATE <= \'',endDate,'\' AND
       PP.EXIT_DATE >= \'',startDate,'\')z)b');
 
-      set queryChronicHltCond = CONCAT('select dataelements,',a,' from (select z.dataelements,z.dk,z.Refused,z.Missing,z.Totalapplicableclients,((z.dk+z.Refused+z.Missing)/z.Totalapplicableclients) as total from(select \'Chronic Health Condition\' as dataelements,PP.ENTRY_DATE,PP.EXIT_DATE,
+      set queryChronicHltCond = CONCAT('select dataelements,',a,' from (select z.dataelements,z.dk as \'Dont Know\',z.Refused,z.Missing,z.Totalapplicableclients,((z.dk+z.Refused+z.Missing)/z.Totalapplicableclients) as total from(select \'Chronic Health Condition\' as dataelements,PP.ENTRY_DATE,PP.EXIT_DATE,
       count(case when CDs.CHRONIC_HEALTH_COND_GCT = 8 then CDs.CHRONIC_HEALTH_COND_GCT end) as dk,
       count(case when CDs.CHRONIC_HEALTH_COND_GCT = 9 then CDs.CHRONIC_HEALTH_COND_GCT end) as refused,
       count(case when CDs.CHRONIC_HEALTH_COND_GCT = 99 then CDs.CHRONIC_HEALTH_COND_GCT end) as missing,
@@ -180,7 +174,7 @@ BEGIN
       PP.ENTRY_DATE <= \'',endDate,'\' AND
       PP.EXIT_DATE >= \'',startDate,'\')z)b');
 
-      set queryHivAids = CONCAT('select dataelements,',a,' from (select z.dataelements,z.dk,z.Refused,z.Missing,z.Totalapplicableclients,((z.dk+z.Refused+z.Missing)/z.Totalapplicableclients) as total from(select \'HIV/AIDS\' as dataelements,PP.ENTRY_DATE,PP.EXIT_DATE,
+      set queryHivAids = CONCAT('select dataelements,',a,' from (select z.dataelements,z.dk as \'Dont Know\',z.Refused,z.Missing,z.Totalapplicableclients,((z.dk+z.Refused+z.Missing)/z.Totalapplicableclients) as total from(select \'HIV/AIDS\' as dataelements,PP.ENTRY_DATE,PP.EXIT_DATE,
       count(case when CDs.HIVAIDS_GCT = 8 then CDs.HIVAIDS_GCT end) as dk,
       count(case when CDs.HIVAIDS_GCT = 9 then CDs.HIVAIDS_GCT end) as refused,
       count(case when CDs.HIVAIDS_GCT = 99 then CDs.HIVAIDS_GCT end) as missing,
@@ -201,7 +195,7 @@ BEGIN
       PP.ENTRY_DATE <= \'',endDate,'\' AND
       PP.EXIT_DATE >= \'',startDate,'\')z)b');
 
-      set queryMentlHlth = CONCAT('select dataelements,',a,' from (select z.dataelements,z.dk,z.Refused,z.Missing,z.Totalapplicableclients,((z.dk+z.Refused+z.Missing)/z.Totalapplicableclients) as total from(select \'Mental Health\' as dataelements,PP.ENTRY_DATE,PP.EXIT_DATE,
+      set queryMentlHlth = CONCAT('select dataelements,',a,' from (select z.dataelements,z.dk as \'Dont Know\',z.Refused,z.Missing,z.Totalapplicableclients,((z.dk+z.Refused+z.Missing)/z.Totalapplicableclients) as total from(select \'Mental Health\' as dataelements,PP.ENTRY_DATE,PP.EXIT_DATE,
       count(case when CDs.MENTAL_HEALTH_GCT = 8 then CDs.MENTAL_HEALTH_GCT end) as dk,
       count(case when CDs.MENTAL_HEALTH_GCT = 9 then CDs.MENTAL_HEALTH_GCT end) as refused,
       count(case when CDs.MENTAL_HEALTH_GCT = 99 then CDs.MENTAL_HEALTH_GCT end) as missing,
@@ -222,7 +216,7 @@ BEGIN
       PP.ENTRY_DATE <= \'',endDate,'\' AND
       PP.EXIT_DATE >= \'',startDate,'\')z)b');
 
-      set querySubstncAbs = CONCAT('select dataelements,',a,' from (select z.dataelements,z.dk,z.Refused,z.Missing,z.Totalapplicableclients,((z.dk+z.Refused+z.Missing)/z.Totalapplicableclients) as total from(select \'Substance Abuse\' as dataelements,PP.ENTRY_DATE,PP.EXIT_DATE,
+      set querySubstncAbs = CONCAT('select dataelements,',a,' from (select z.dataelements,z.dk as \'Dont Know\',z.Refused,z.Missing,z.Totalapplicableclients,((z.dk+z.Refused+z.Missing)/z.Totalapplicableclients) as total from(select \'Substance Abuse\' as dataelements,PP.ENTRY_DATE,PP.EXIT_DATE,
       count(case when CDs.SUBSTANCE_ABUSE_CODE = 8 then CDs.SUBSTANCE_ABUSE_CODE end) as dk,
       count(case when CDs.SUBSTANCE_ABUSE_CODE = 9 then CDs.SUBSTANCE_ABUSE_CODE end) as refused,
       count(case when CDs.SUBSTANCE_ABUSE_CODE = 99 then CDs.SUBSTANCE_ABUSE_CODE end) as missing,
@@ -243,7 +237,7 @@ BEGIN
       PP.ENTRY_DATE <= \'',endDate,'\' AND
       PP.EXIT_DATE >= \'',startDate,'\')z)b');
 
-      set queryDomstcViolnc = CONCAT('select dataelements,',a,' from (select z.dataelements,z.dk,z.Refused,z.Missing,z.Totalapplicableclients,((z.dk+z.Refused+z.Missing)/z.Totalapplicableclients) as total from(select \'Domestic Violence\' as dataelements,PP.ENTRY_DATE,PP.EXIT_DATE,
+      set queryDomstcViolnc = CONCAT('select dataelements,',a,' from (select z.dataelements,z.dk as \'Dont Know\',z.Refused,z.Missing,z.Totalapplicableclients,((z.dk+z.Refused+z.Missing)/z.Totalapplicableclients) as total from(select \'Domestic Violence\' as dataelements,PP.ENTRY_DATE,PP.EXIT_DATE,
       count(case when CDs.DOMES_VIOLENCE_GCT = 8 then CDs.DOMES_VIOLENCE_GCT end) as dk,
       count(case when CDs.DOMES_VIOLENCE_GCT = 9 then CDs.DOMES_VIOLENCE_GCT end) as refused,
       count(case when CDs.DOMES_VIOLENCE_GCT = 99 then CDs.DOMES_VIOLENCE_GCT end) as missing,
@@ -264,7 +258,7 @@ BEGIN
       PP.ENTRY_DATE <= \'',endDate,'\' AND
       PP.EXIT_DATE >= \'',startDate,'\')z)b');
 
-      set queryHousngSts = CONCAT('select dataelements,',a,' from (select z.dataelements,z.dk,z.Refused,z.Missing,z.Totalapplicableclients,((z.dk+z.Refused+z.Missing)/z.Totalapplicableclients) as total from(select \'Housing Status\' as dataelements,PP.ENTRY_DATE,PP.EXIT_DATE,
+      set queryHousngSts = CONCAT('select dataelements,',a,' from (select z.dataelements,z.dk as \'Dont Know\',z.Refused,z.Missing,z.Totalapplicableclients,((z.dk+z.Refused+z.Missing)/z.Totalapplicableclients) as total from(select \'Housing Status\' as dataelements,PP.ENTRY_DATE,PP.EXIT_DATE,
       count(case when CH.HOUSEHOLD_KEY = 8 then CH.HOUSEHOLD_KEY end) as dk,
       count(case when CH.HOUSEHOLD_KEY = 9 then CH.HOUSEHOLD_KEY end) as refused,
       count(case when (CH.HOUSEHOLD_KEY = \'\' or CH.HOUSEHOLD_KEY is null) then CH.HOUSEHOLD_KEY end) as missing,
@@ -285,7 +279,7 @@ BEGIN
       PP.ENTRY_DATE <= \'',endDate,'\' AND
       PP.EXIT_DATE >= \'',startDate,'\')z)b');
 
-      set queryDateOfBirth = CONCAT('select dataelements,',a,' from (select z.dataelements,z.dk,z.Refused,z.Missing,z.Totalapplicableclients,((z.dk+z.Refused+z.Missing)/z.Totalapplicableclients) as total from
+      set queryDateOfBirth = CONCAT('select dataelements,',a,' from (select z.dataelements,z.dk as \'Dont Know\',z.Refused,z.Missing,z.Totalapplicableclients,((z.dk+z.Refused+z.Missing)/z.Totalapplicableclients) as total from
       (select \'Date Of Birth\' as dataelements,PP.ENTRY_DATE,PP.EXIT_DATE,
       count(case when C.DOB_TYPE_CODE = 8 then C.DOB_TYPE_CODE end) as dk,
       count(case when C.DOB_TYPE_CODE = 4 then C.DOB_TYPE_CODE end) as Refused,
@@ -306,21 +300,21 @@ BEGIN
       PP.ENTRY_DATE <= \'',endDate,'\' AND
       PP.EXIT_DATE >= \'',startDate,'\')z)b');
       
-      set queryFirstName = CONCAT('select dataelements,',a,' from (select \'First Name\' as dataelements,\'0\' as dk,\'0\' as Refused,\'0\' as Missing)b');
+      set queryFirstName = CONCAT('select dataelements,',a,' from (select \'First Name\' as dataelements,\'0\' as \'Dont Know\',\'0\' as Refused,\'0\' as Missing)b');
 
-		set queryLastName = CONCAT('select dataelements,',a,' from (select \'Last Name\' as dataelements,\'0\' as dk,\'0\' as Refused,\'0\' as Missing)b');
+		set queryLastName = CONCAT('select dataelements,',a,' from (select \'Last Name\' as dataelements,\'0\' as \'Dont Know\',\'0\' as Refused,\'0\' as Missing)b');
 		
-		set queryRes = CONCAT('select dataelements,',a,' from (select \'Residence Prior To Entry\' as dataelements,\'0\' as dk,\'0\' as Refused,\'0\' as Missing)b');
+		set queryRes = CONCAT('select dataelements,',a,' from (select \'Residence Prior To Entry\' as dataelements,\'0\' as \'Dont Know\',\'0\' as Refused,\'0\' as Missing)b');
 		
-		set queryZip = CONCAT('select dataelements,',a,' from (select \'Zip Of Last Perm Residence\' as dataelements,\'0\' as dk,\'0\' as Refused,\'0\' as Missing)b');
+		set queryZip = CONCAT('select dataelements,',a,' from (select \'Zip Of Last Perm Residence\' as dataelements,\'0\' as \'Dont Know\',\'0\' as Refused,\'0\' as Missing)b');
 		
-		set queryIncomeEntry = CONCAT('select dataelements,',a,' from (select \'Income (At Entry)\' as dataelements,\'0\' as dk,\'0\' as Refused,\'0\' as Missing)b');
+		set queryIncomeEntry = CONCAT('select dataelements,',a,' from (select \'Income (At Entry)\' as dataelements,\'0\' as \'Dont Know\',\'0\' as Refused,\'0\' as Missing)b');
 		
-		set queryIncomeExit = CONCAT('select dataelements,',a,' from (select \'Income (At Exit)\' as dataelements,\'0\' as dk,\'0\' as Refused,\'0\' as Missing)b');
+		set queryIncomeExit = CONCAT('select dataelements,',a,' from (select \'Income (At Exit)\' as dataelements,\'0\' as \'Dont Know\',\'0\' as Refused,\'0\' as Missing)b');
 		
-		set queryBenefitsEntry = CONCAT('select dataelements,',a,' from (select \'Non-cash Benefits (At Entry)\' as dataelements,\'0\' as dk,\'0\' as Refused,\'0\' as Missing)b');
+		set queryBenefitsEntry = CONCAT('select dataelements,',a,' from (select \'Non-cash Benefits (At Entry)\' as dataelements,\'0\' as \'Dont Know\',\'0\' as Refused,\'0\' as Missing)b');
 		
-		set queryBenefitsExit = CONCAT('select dataelements,',a,' from (select \'Non-cash Benefits (At Exit)\' as dataelements,\'0\' as dk,\'0\' as Refused,\'0\' as Missing)b');
+		set queryBenefitsExit = CONCAT('select dataelements,',a,' from (select \'Non-cash Benefits (At Exit)\' as dataelements,\'0\' as \'Dont Know\',\'0\' as Refused,\'0\' as Missing)b');
 		
 		IF((akey != '') && (pkey != '') && (type_code != '') && (coc_key !='')) THEN
 		
@@ -509,11 +503,10 @@ BEGIN
    ELSE 
    	set innerQuery = CONCAT('select 1 as one');
    END IF;
-      --  select innerQuery;
+      -- select innerQuery;
       set @Query = CONCAT('select * from (',innerQuery,') a');
-       prepare b from @Query;
-       execute b;
-      select a;
+      prepare b from @Query;
+      execute b;
 END//
 DELIMITER ;
 /*!40101 SET SQL_MODE=IFNULL(@OLD_SQL_MODE, '') */;

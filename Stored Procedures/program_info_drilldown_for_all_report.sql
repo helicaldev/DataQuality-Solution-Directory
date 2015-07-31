@@ -69,7 +69,7 @@ BEGIN
 				set codeR = CONCAT(codeR,',','16');
       END IF;
       
-       IF(INSTR(resultsOpt,'dk')) THEN
+       IF(INSTR(resultsOpt,'Dont Know')) THEN
        		set code = CONCAT(code,codeD);
 
       END IF;
