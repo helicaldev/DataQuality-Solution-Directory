@@ -1,7 +1,7 @@
-<script src="/PCNI/js/project/jquery.dynatable.js"></script>
-<script src="/PCNI/js/project/c3.js"></script>
-<script src="/PCNI/js/project/dp_test.js"></script>
-<link rel="stylesheet" type="text/css" href="/PCNI/css/project/c3.css">
+<script src="js/project/jquery.dynatable.js"></script>
+<script src="js/project/c3.js"></script>
+<script src="js/project/dp_test.js"></script>
+<link rel="stylesheet" type="text/css" href="css/project/c3.css">
 <style type="text/css">
 th a {
   color: #fff;
@@ -261,7 +261,7 @@ color:black;
   .alert-info, .dynatable-per-page, .dynatable-search{
     display: none !important;
   }
-
+s
   .breadcrumb a {
     color: #222;
   }
@@ -272,7 +272,6 @@ color:black;
         display: none;
     }
 }
-
 </style>
 <div id="custom_dummytag"/>
 <div id="custom_dummytag1"/>
@@ -282,7 +281,6 @@ color:black;
             <li id="back"><a href="#">Template</a></li>
             <li id="main-report" class="hidden"><a href="#">Main Report</a></li>
             <li id="drilldown-report" class="hidden">Drilldown Report</li>
-			<li id="drilldown-report-all" class="hidden">Get All Info</li>
         </ol>
     </div>
     <div class="row">
@@ -348,14 +346,6 @@ color:black;
                         <a href="#" class="hidden-print">More</a>
                     </div>
                 </div>
-				<div class="form-group">
-                    <label class="col-xs-4"></label>
-					<label class="col-xs-8"></label>
-            </div>
-			<div class="form-group">
-                    <label class="col-xs-4" id = "getAllInfo" style="color:#878bd2;text-decoration:underline;">Get All Information</label>
-					<label class="col-xs-8"></label>
-            </div>
             </div>
         </div>
     </div>
@@ -364,24 +354,22 @@ color:black;
     <div class="row" id="wrap2"></div>
     <div class="row" id="c3chart"></div>
     <div class="row" id="drill"></div>
-	<div class="row" id="wrap3"></div>
     <div class="row" id="wrap">
-        <h4>Template : Program Information</h4>
+        <h4>Template : Data Quality APR DK&amp;R</h4>
 		
         <div class="form-horizontal">
 		<form id="DQForm">
             <div class="form-group">
+                <label class="col-sm-2 control-label text-left">Population :</label>
+                <div class="col-sm-10" id="population"></div>
+            </div>
+            <div class="form-group">
                 <label class="col-sm-2 control-label text-left">Agency/Group :</label>
                 <div class="col-sm-10" id="agency"></div>
             </div>
-			
             <div class="form-group">
-                <label class="col-sm-2 control-label text-left">Project :</label>
+                <label class="col-sm-2 control-label text-left">Select Project :</label>
                 <div class="col-sm-10" id="project"></div>
-            </div>
-			<div class="form-group">
-                <label class="col-sm-2 control-label text-left">Project Type:</label>
-                <div class="col-sm-10" id="projectType"></div>
             </div>
             <div class="form-group">
                 <label class="col-sm-2 control-label text-left">Date Range :</label>
@@ -390,16 +378,8 @@ color:black;
                 <label class="col-sm-1 control-label">to End</label>
                 <div class="col-sm-4" id="endDate"></div>
             </div>
-			<div class="form-group">
-                <label class="col-sm-2 control-label text-left">Client Location:</label>
-                <div class="col-sm-10" id="clientLocation"></div>
-            </div>
-			<div class="form-group">
-                <label class="col-sm-2 control-label text-left">Data Elements Groups:</label>
-                <div class="col-sm-10" id="dataElementsGrps"></div>
-            </div>
             <div class="form-group">
-                <label class="col-sm-2 control-label text-left">Data Elements :</label>
+                <label class="col-sm-2 control-label text-left">Select Data Elements :</label>
                 <div class="col-sm-10" id="dataElements"></div>
             </div>
             <div class="form-group">
@@ -416,7 +396,7 @@ color:black;
         </div>
 		
     </div>
-	
+
 </div>
 <!--  scheduling - modal-->
 <div class="modal fade" id="clientAttr" tabindex="-1" role="dialog" aria-labelledby="drillDownModalLabel" aria-hidden="true">
@@ -438,27 +418,6 @@ color:black;
   </div>
 </div>
 </div>
-
-<div class="modal fade" id="clientAttr_all" tabindex="-1" role="dialog" aria-labelledby="drillDownModalLabel" aria-hidden="true">
-  <div class="modal-dialog">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h4 class="modal-title" id="drillDownModalLabel">Client Attributes For Drill Down Output</h4>
-      </div>
-      <div class="modal-body">
-        <div class="form-group">
-            <div class="col-xs-12" id="clientAttrPopup_all"></div>
-         </div>
-      </div>
-      <div class="modal-footer">
-        <div class="form-group">
-        <div id="runDrillDown_all" class="col-sm-3 col-sm-offset-9"></div>
-        </div>
-    </div>
-  </div>
-</div>
-</div>
-
 <div class="modal fade" id="saveModal" class="" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
 	 <div class="modal-dialog">
 		<div class="modal-content">
@@ -501,14 +460,10 @@ color:black;
         dashboard.setVariable('run_now','false');
         dashboard.setVariable('run_now_drillDown','false');
         dashboard.setVariable('drillDown','false');
-		dashboard.setVariable('run_now_drillDown_all','false');
-		dashboard.setVariable('drillDown_all','false');
-		dashboard.setVariable('hide_result','false');
+        dashboard.setVariable('PKey',[]);
         dashboard.setVariable('recipients',[]);
-		dashboard.setVariable('uid',"'"+window.DashboardGlobals.sessionUserName+"'");
-		console.log(dashboard.getVariable('uid'));
+
         var f = "${format}";
-		var reportDesc;
 
          if(f.indexOf("{format}") >= 0){
           dashboard.setVariable('format',[]);
@@ -553,7 +508,7 @@ color:black;
           dashboard.setVariable('dataelements',dataElement.replace(/'/g,'').split(','));
          }
 
-         var resultOption = "${RESULTOPTIONS}";
+           var resultOption = "${RESULTOPTIONS}";
 
          if(resultOption.indexOf("{RESULTOPTIONS}") >= 0){
           dashboard.setVariable('RESULTOPTIONS',['Missing','Refused']);
@@ -570,86 +525,14 @@ color:black;
          else{
           dashboard.setVariable('Akey',agency_key.replace(/'/g,'').split(','));
          }
-		 
-		 var agency_key_1 = "${Akey_1}";
 
-         if(agency_key_1.indexOf("{Akey_1}") >= 0){
-          dashboard.setVariable('Akey_1',['82']);
-         }
-         else{
-          dashboard.setVariable('Akey_!',agency_key_1.replace(/'/g,'').split(','));
-         }
-		 
-		var coc_location = "${coc}";
-
-         if(coc_location.indexOf("{coc}") >= 0){
-          dashboard.setVariable('coc',['1']);
-         }
-         else{
-          dashboard.setVariable('coc',coc_location.replace(/'/g,'').split(','));
-         }
-		 
-		 var prj_type = "${CODE_KEY}";
-
-         if(prj_type.indexOf("{CODE_KEY}") >= 0){
-          dashboard.setVariable('CODE_KEY',['1']);
-         }
-         else{
-          dashboard.setVariable('CODE_KEY',prj_type.replace(/'/g,'').split(','));
-         }
-
-		 
-		 var dataElemGroup = "${did}";
-
-         if(dataElemGroup.indexOf("{did}") >= 0){
-          dashboard.setVariable('did',['1']);
-         }
-         else{
-          dashboard.setVariable('did',dataElemGroup.replace(/'/g,'').split(','));
-         }
-		 
-		 var dataElemGroup_1 = "${did_1}";
-
-         if(dataElemGroup_1.indexOf("{did_1}") >= 0){
-          dashboard.setVariable('did_1',['1']);
-         }
-         else{
-          dashboard.setVariable('did_1',dataElemGroup_1.replace(/'/g,'').split(','));
-         }
-
-
-         var Project_Key = "${PKey}";
+           var Project_Key = "${PKey}";
 
          if(Project_Key.indexOf("{PKey}") >= 0){
           dashboard.setVariable('PKey',['3172']);
          }
          else{
           dashboard.setVariable('PKey',Project_Key.replace(/'/g,'').split(','));
-         }
-		 
-		 var Project_Key_1 = "${PKey_1}";
-
-         if(Project_Key.indexOf("{PKey_1}") >= 0){
-          dashboard.setVariable('PKey_1',['3172']);
-         }
-         else{
-          dashboard.setVariable('PKey_1',Project_Key_1.replace(/'/g,'').split(','));
-         }
-		 
-		 var Result_key = "${Rkey}";
-		if(Result_key.indexOf("{Rkey}") >= 0){
-          dashboard.setVariable('Rkey',['Missing','Refused']);
-         }
-         else{
-          dashboard.setVariable('Rkey',Result_key.replace(/'/g,'').split(','));
-         }
-		 
-		 var Result_option = "${result_option}";
-		if(Result_option.indexOf("{result_option}") >= 0){
-          dashboard.setVariable('result_option',['Missing','Refused']);
-         }
-         else{
-          dashboard.setVariable('result_option',Result_option.replace(/'/g,'').split(','));
          }
 
          var startDate = "${sDate}";
@@ -678,42 +561,6 @@ color:black;
          else{
           dashboard.setVariable('cdisplay',ClientAttribute.replace(/'/g,'').split(','));
          }
-		 
-		 var ClientAttribute_org = "${cdisplay_org}";
-
-         if(ClientAttribute_org.indexOf("{cdisplay_org}") >= 0){
-          dashboard.setVariable('cdisplay_org','Client Key');
-         }
-         else{
-          dashboard.setVariable('cdisplay_org',ClientAttribute_org.replace(/'/g,'').split(','));
-         }
-		 
-		 var ClientAttribute_org_all = "${cdisplay_org_all}";
-
-         if(ClientAttribute_org_all.indexOf("{cdisplay_org_all}") >= 0){
-          dashboard.setVariable('cdisplay_org_all','Client Key');
-         }
-         else{
-          dashboard.setVariable('cdisplay_org_all',ClientAttribute_org_all.replace(/'/g,'').split(','));
-         }
-		 
-		 var ClientAttributeTest = "${clientattr}";
-
-         if(ClientAttributeTest.indexOf("{clientattr}") >= 0){
-          dashboard.setVariable('clientattr','Client Key');
-         }
-         else{
-          dashboard.setVariable('clientattr',ClientAttributeTest.replace(/'/g,'').split(','));
-         }
-		 
-		 var ClientAttribute_all = "${cdisplay_all}";
-
-         if(ClientAttribute_all.indexOf("{cdisplay_all}") >= 0){
-          dashboard.setVariable('cdisplay_all','Client Key');
-         }
-         else{
-          dashboard.setVariable('cdisplay_all',ClientAttribute_all.replace(/'/g,'').split(','));
-         }
 
          var row = "${rowHeader}";
          if(row.indexOf("{rowHeader}") >= 0){
@@ -734,12 +581,29 @@ color:black;
 
         var projectNames = "${projectNames}";
         if(projectNames.indexOf("{projectNames}") >= 0){
-            dashboard.setVariable('projectNames',[]);
+            dashboard.setVariable('projectNames',['']);
             projectNames = false;
+          console.log('no projectNames');
         } else {
             projectNames = projectNames.replace(/'/g,'').split(',');
             dashboard.setVariable('projectNames',projectNames);
-       }
+        }
+
+
+var selectPopulation = {
+    name: "selectPopulation",
+    type:  "select",
+    options:{
+        multiple:false,
+        value : 'Population',
+        display : 'Population',
+        placeholder: 'Select Population'
+    },
+    htmlElementId : "#population",
+    executeAtStart: true,
+    map:1,
+    iframe:true
+};
 
 var selectProjectName = {
     name: "selectProjectName",
@@ -753,170 +617,75 @@ var selectProjectName = {
         placeholder: 'Select Project'
     },
     requestParameters:{
-    Akey:"Akey",
-	Akey_1:"Akey"
+    Akey:"Akey"
     },
     htmlElementId : "#project",
     executeAtStart: true,
-    map:13
+    map:2
 };
 
 var selectAgencyName = {
     name: "selectAgencyName",
     type:  "select2",
     parameters:["Akey"],
-	listeners:["uid"],
     options:{
         multiple:true,
         value : 'Akey',
         display : 'Agency',
         placeholder: 'Select Agency'
     },
-	requestParameters:{
-	uid:"uid"
-	},
     htmlElementId : "#agency",
     executeAtStart: true,
-    map:12,
+    map:3,
     iframe:true
-};
-
-var selectProjType = {
-    name: "selectProjType",
-    type:  "select2",
-    parameters:["CODE_KEY"],
-	listeners:["PKey"],
-    options:{
-        multiple:true,
-        value : 'CODE_KEY',
-        display : 'SHORT_DESC',
-        placeholder: 'Select Project Type'
-    },
-	requestParameters: {
-	PKey:"PKey",
-	PKey_1:"PKey"
-	},
-    htmlElementId : "#projectType",
-    executeAtStart: true,
-    map:10,
-    iframe:true
-};
-
-var selectClientLoc = {
-    name: "selectClientLoc",
-    type:  "select2",
-    parameters:["coc"],
-	listeners : ["PKey"],
-    options:{
-        multiple:true,
-        value : 'COC_KEY',
-        display : 'COC_LOCATION',
-        placeholder: 'Select Client Location'
-    },
-	requestParameters : {
-	PKey:"PKey",
-	PKey_1:"PKey"
-	},
-    htmlElementId : "#clientLocation",
-    executeAtStart: true,
-    map:11,
-    iframe:true
-};
-
-var selectDataElementsGroups = {
-    name: "selectDataElementsGroups",
-    type:  "select2",
-    parameters : ["did"],
-    options:{
-        multiple:true,
-        value : 'did',
-        display : 'dGroup'
-    },
-    htmlElementId : "#dataElementsGrps",
-    executeAtStart: true,
-    map:9,
 };
 
 var selectDataElements = {
     name: "selectDataElements",
-    type:  "select2",
+    type:  "select",
     parameters : ["dataelements"],
-	listeners:["did"],
     options:{
         multiple:true,
         value : 'dataelements',
         display : 'dataelements'
     },
-	requestParameters:{
-    did:"did",
-	did_1:"did"
-    },
     htmlElementId : "#dataElements",
     executeAtStart: true,
-    map:14
+    map:4,
 };
 
 var selectResultOption = {
     name: "selectResultOption",
-    type:  "select2",
-    parameters :["Rkey"],
+    type:  "select",
+    parameters :["RESULTOPTIONS"],
     options:{
         multiple:true,
-        value : 'Rkey',
+        value : 'ResultOptions',
         display : 'ResultOptions',
     },
     htmlElementId : "#resultOptions",
     executeAtStart: true,
-    map:15
-};
-
-var getResultOption = {
-    name: "getResultOption",
-    type: "custom",
-    listeners: ["Rkey"],
-    htmlElementId: "#custom_dummytag",
-    customScript: function(a,b) {
-        //console.log('----- Executing custom script ---- run_now = ' + dashboard.getVariable('run_now'));
-        var a = dashboard.getVariable('Rkey');
-			if (a.indexOf("ALL") > -1)
-			{
-			  a = ["Dont Know","Refused","Missing"];
-			}
-			else 
-			{
-			  a = dashboard.getVariable('Rkey');
-			}
-			Dashboard.setVariable('result_option',a);
-			//alert(Rkey);
-    },
-    executeAtStart: false
+    map:5,
 };
 
 var dynaTable = {
     name: "dynaTable",
     type:"chart",
     requestParameters :{
+        dataelements : "dataelements",
+        RESULTOPTIONS : "RESULTOPTIONS",
         Akey: "Akey",
         PKey : "PKey",
-		CODE_KEY:"CODE_KEY",
-		coc:"coc",
-		dataelements : "dataelements",
-        result_option : "result_option",
         sDate : "sDate",
         eDate : "eDate"
     },
-	map: 19,
+	map: 6,
     htmlElementId : "#wrap1",
     executeAtStart: false,
 	customScript: function(data)
 	{
-			if(_.pluck(data, 'one')==1)
-			{
-					$('#wrap1').html("<div style='border:1px solid;'><h2 style='text-align:CENTER;color:#927333;'>No Data To Display</h2></div>");
-					return;
-		
-			}
-			else {
+		//var data = jQuery.parseJSON(data);
+						
 					var drillDown = dashboard.setVariable('drillDown','false');
 						var data2 = [];
 						for(var i = 0; i< data.length; i++){
@@ -938,14 +707,8 @@ var dynaTable = {
 						var table = $('<table id="chart_4_table" class="table table-bordered table-striped" "style=background-border:black;"><thead><tr></tr></thead><tbody></tbody></table>');
 							
 							
-						var columns1 = Dashboard.getVariable("result_option");
-						
-						var temp = columns1.toString(); 
-						temp = temp.replace(/'/g,'');
-
-						temp = temp.split(',');
-
-					    var columns = ['dataelements'].concat(temp);
+						var columns1 = Dashboard.getVariable("RESULTOPTIONS");
+						var columns = ['dataelements'].concat(columns1);
 						
 						for (var i = 0; i<columns.length; i++){
 							table.find('thead tr').append('<th>' + columns[i] + '</th>');
@@ -962,17 +725,26 @@ var dynaTable = {
 						  },features: {
 							pushState: false
 						  },
-						})
+						}).on('dynatable:sorts:added dynatable:sorts:removed', stylizeTable)
 						.data('dynatable');
 
 
 						$("#toolbar").removeClass('hidden');
 
+						function stylizeTable (){
 							$('#chart_4_table').find('td').each(function(){
 								var elem = $(this);
 								if( elem.is(':first-child') || elem.text() === '0' ) return; 
 								elem.css( {"text-decoration" : "underline", "cursor" : "pointer"}); 
 							});
+						}
+						
+						stylizeTable();
+
+						$('#chart_4_table').find('th').each(function(){
+						  if($(this).text().match('total'))
+						  $('#chart_4_table td:last-child').css("text-decoration", "none");
+						});
 						
 						$('#chart_4_table').on('click', 'td',function () {
 					  
@@ -991,7 +763,6 @@ var dynaTable = {
 						   }
 						   return false;
 						});
-         }
 	}
 };
 
@@ -1020,66 +791,28 @@ var selectClientAttr = {
     type:  "select2",
     parameters : ["cdisplay"],
     options:{
-        multiple : true,
+        multiple:true,
         value : 'cdisplay',
-        display : 'clientattr',
+        display : 'cdisplay',
     },
     htmlElementId : "#clientAttrPopup",
     executeAtStart: true,
-    map:16
-};
-
-var selectClientAttrAll = {
-    name: "selectClientAttrAll",
-    type:  "select2",
-    parameters : ["cdisplay_all"],
-    options:{
-        multiple:true,
-        value : 'cdisplay_all',
-        display : 'clientattr',
-    },
-    htmlElementId : "#clientAttrPopup_all",
-    executeAtStart: true,
-    map:17
-};
-
-var getClientAttr = {
-    name: "getClientAttr",
-    type: "custom",
-    listeners: ["cdisplay"],
-    htmlElementId: "#custom_dummytag",
-    customScript: function(a,b) {
-        //console.log('----- Executing custom script ---- run_now = ' + dashboard.getVariable('run_now'));
-        var a = dashboard.getVariable('cdisplay');
-			if (a.indexOf("ALL") > -1)
-			{
-			  a = ["`Client Key`","`First Name`","`Last Name`","`Date Of Birth`","Gender","Race","Ethnicity","`Veteran Status`","`Project Entry Date`","`Project Exit Date`","`Entering User Key`"];      // alert('all is selected');
-			}
-			else 
-			{
-			  a = dashboard.getVariable('cdisplay');
-			}
-			Dashboard.setVariable('cdisplay_org',a);
-			//alert(Rkey);
-    },
-    executeAtStart: false
+    map:7
 };
 
 var drillDynaTable = {
     name: "drillDynaTable",
     type:"chart",
     requestParameters :{
+        cdisplay : "cdisplay",
         rowHeader : "rowHeader",
+        colHeader : "colHeader",
         Akey : "Akey",
         PKey : "PKey",
-		colHeader : "colHeader",
-		cdisplay_org : "cdisplay_org",
         sDate : "sDate",
-        eDate : "eDate",
-		CODE_KEY : "CODE_KEY",
-		coc : "coc"
+        eDate : "eDate"
     },
-    map:20,
+    map:8,
     htmlElementId : "#drill",
     executeAtStart: false,
 	customScript: function(data)
@@ -1126,93 +859,6 @@ var drillDynaTable = {
 	}
 };
 
-var getClientAttr_all = {
-    name: "getClientAttr_all",
-    type: "custom",
-    listeners: ["cdisplay_all"],
-    htmlElementId: "#custom_dummytag",
-    customScript: function(a,b) {
-        //console.log('----- Executing custom script ---- run_now = ' + dashboard.getVariable('run_now'));
-        var a = dashboard.getVariable('cdisplay_all');
-			if (a.indexOf("ALL") > -1)
-			{
-			  a = ["`Client Key`","`First Name`","`Last Name`","`Date Of Birth`","Gender","Race","Ethnicity","`Veteran Status`","`Project Entry Date`","`Project Exit Date`","`Entering User Key`"];      // alert('all is selected');
-			}
-			else 
-			{
-			  a = dashboard.getVariable('cdisplay_all');
-			}
-			Dashboard.setVariable('cdisplay_org_all',a);
-			//alert(Rkey);
-    },
-    executeAtStart: false
-};
-
-<!-- another drill down component added -->
-var drillDynaTableAll = {
-    name: "drillDynaTableAll",
-    type:"chart",
-    requestParameters :{
-		dataelements : "dataelements",
-		Akey : "Akey",
-        PKey : "PKey",
-		result_option : "result_option",
-		cdisplay_org_all : "cdisplay_org_all",
-        sDate : "sDate",
-        eDate : "eDate",
-		CODE_KEY : "CODE_KEY",
-		coc : "coc"
-    },
-    map:18,
-    htmlElementId : "#wrap3",
-    executeAtStart: false,
-	customScript: function(data)
-	{
-		var drillDown_all = dashboard.setVariable('drillDown_all','true');
-		var drillDown = dashboard.setVariable('drillDown','false');
-            var data2 = [];
-        for(var i = 0; i< data.length; i++){
-          var temp={};
-          for (var key in data[i]){
-            if( data[i].hasOwnProperty(key)){
-               temp[key.toLowerCase()] = data[i][key];
-            }
-          }
-     data2.push(temp);
-       }
-  
-		  data = data2;
-		  delete data2;
-		  console.log(data);
-
-			$("#wrap3").addClass('panel').addClass('panel-primary');
-
-		var table = $('<table id="chart_5_table" class="table table-bordered table-striped"><thead><tr></tr></thead><tbody></tbody></table>');
-
-		for (key in data[0]){
-			table.find('thead tr').append('<th>' + key + '</th>');
-		}
-
-		/*$('#chart_5').append('<h3 class="panel-heading" style="margin-top:0; clear: none">Detailed Sales Report</h3>')                    */
-
-		$('#wrap3').append(table);
-
-		var dynatable = $('#chart_5_table').dynatable({
-		  table :{
-			defaultColumnIdStyle : 'lowercase'
-		  },
-		  dataset: {
-			records: data
-		  }
-		}).data('dynatable');
-
-
-
-	}
-};
-
-<!-- end of another drill down table-->
-
 var button = {
     name: "button",
     type:  "button",
@@ -1235,17 +881,6 @@ var drillButton ={
     executeAtStart: false
 };
 
-var drillButtonAll ={
-    name: "drillButtonAll",
-    type:  "button",
-    options: {
-        display : "Run",
-        classes: "btn-success btn-block btn-pcni"
-    },
-    htmlElementId: "#runDrillDown_all",
-    executeAtStart: false
-};
-
 var drillButtonSave ={
     name: "drillButtonSave",
     type:  "button",
@@ -1260,8 +895,6 @@ var drillButtonSave ={
 var datepicker1 ={
     name: "datepicker",
     type:  "datepicker",
-	options : {
- 	displayFormat:"MM-DD-YYYY"},
     parameters: ["sDate"],
     htmlElementId: "#startDate",
     executeAtStart: true
@@ -1270,8 +903,6 @@ var datepicker1 ={
 var datepicker2 ={
     name: "datepicker2",
     type:  "datepicker",
-	options : {
- 	displayFormat:"MM-DD-YYYY"},
     parameters: ["eDate"],
     htmlElementId: "#endDate",
     executeAtStart: true
@@ -1309,16 +940,14 @@ var chart1 = {
     type:"chart",
     listeners:[],
     requestParameters :{
+        dataelements :"dataelements",
+        RESULTOPTIONS:"RESULTOPTIONS",
         Akey: "Akey",
         PKey : "PKey",
-		CODE_KEY:"CODE_KEY",
-		coc:"coc",
-		dataelements : "dataelements",
-        result_option : "result_option",
         sDate : "sDate",
         eDate : "eDate"
     },
-    map:19,
+    map:6,
     htmlElementId : "#wrap2",
     executeAtStart: false,
     options:{
@@ -1337,18 +966,10 @@ var chart1 = {
     },
 	customScript: function(data)
 	{
-		if(_.pluck(data, 'one')==1)
-			{
-					$('#wrap2').html("<div style='border:1px solid;'><h2 style='text-align:CENTER;color:#927333;'>No Data To Display</h2></div>");
-					return;
-		
-			}
-		else {
-			var drillDown = dashboard.setVariable('drillDown','false');
+		var drillDown = dashboard.setVariable('drillDown','false');
             var resultoptions = dashboard.getVariable('RESULTOPTIONS');
             $("#dynatable-processing-chart_4_table").remove();
 			//$("#wrap2 .chart").empty();
-			$('#getAllInfo').hide();
             for (var i in resultoptions) {
                 var divtag = "<div id=\"C3Chart_" + i +"\"></div>"  
                 //alert(resultoptions[i] + divtag);
@@ -1409,7 +1030,6 @@ var chart1 = {
                 dashboard.setVariable('baseChart',baseChart);
                 console.log(dashboard.getVariable('baseChart'));
             }
-		}
 	}
 };
 
@@ -1425,12 +1045,10 @@ var showReportMetaData = function() {
     $('#projectSelector').off();
 
     if(projectNames){
-		
         Dashboard.setVariable('projectNames', projectNames);
       }
     var projects = Dashboard.getVariable('projectNames');
         for (var i = 0; i < projects.length; i++){
-			console.log(projects.length);
             projectList.append("<li>" + projects[i] + "</li>");
         }
 
@@ -1438,7 +1056,6 @@ var showReportMetaData = function() {
             window.bootbox.alert(projects.join("<br>"));
             return false;
         })
-
 };
 
 var runScript = {
@@ -1453,10 +1070,8 @@ var runScript = {
             dashboard.setVariable('run_now','false');
             $('#main-report').removeClass('hidden');
             $('#drilldown-report').addClass('hidden');
-			$('#drilldown-report-all').addClass('hidden');
             $('#wrap').hide();
             $('#wrap1').show();
-			$('#wrap3').hide();
             Dashboard.updateComponent('dynaTable');
 			//getTable("normal");
             $('#toolbar').show();
@@ -1481,8 +1096,6 @@ var runScriptdrillDown = {
             $('#wrap').hide();
             $('#clientAttr').modal('hide');
             $('#wrap1').hide();
-			$('#getAllInfo').hide();
-			$('#wrap3').hide();
             $('#drill').show();
             $('#info').show();
             showReportMetaData();
@@ -1498,50 +1111,23 @@ var runScriptdrillDown = {
     executeAtStart: false
  };
 
- var runScriptdrillDownAll = {
-    name: "runScriptdrillDownAll",
-    type: "custom",
-    listeners: ["run_now_drillDown_all"],
-    htmlElementId: "#custom_dummytag2",
-    customScript: function(a,b){
-        //console.log('----- Executing custom script ---- run_now_drillDown = ' + dashboard.getVariable('run_now_drillDown'));
-        if(dashboard.getVariable('run_now_drillDown_all') == 'true') {
-            dashboard.setVariable('run_now_drillDown_all','false');
-            $('#main-report, #drilldown-report-all').removeClass('hidden');
-            $('#wrap').hide();
-            $('#clientAttr').modal('hide');
-			$('#clientAttr_all').modal('hide');
-            $('#wrap1').hide();
-            $('#drill').hide();
-            $('#info').show();
-			$('#wrap3').show();
-            showReportMetaData();
-            $('#tb-convert-to-charts').addClass('disabled');
-        }
-
-        Dashboard.updateComponent('drillDynaTableAll');
-		//getTable("drill");
-        $('#toolbar').show();
-        $('#tb-convert-to-charts').addClass('disabled');
-        $('#pcni-sub-menu').find('.form-inline').addClass('hidden')
-    },
-    executeAtStart: false
- };
- 
 var saveProjects = {
     name: "saveProjects",
     type: "custom",
     listeners: ["PKey"],
     htmlElementId: "#custom_dummytag",
     customScript: function() {
+        //var projects = Dashboard.getVariable('projectNames');
+        //if (projects == "" || projects.length < 1){
             projects = $('#project').find('input').select2('data');
             Dashboard.setVariable('projectNames', _.pluck(projects, 'text'))
-
+        //}
+        //console.log(projects)
     },
     executeAtStart: true
 };
- 
- var components = [selectProjectName,selectAgencyName,selectProjType,selectClientLoc,selectDataElementsGroups,selectDataElements,selectResultOption,getResultOption,dynaTable,modal_save,total_count,datepicker1,datepicker2,button,scheduleSDate,scheduleEDate,runScript,selectClientAttr,selectClientAttrAll,drillButton,getClientAttr,drillDynaTable,getClientAttr_all,drillDynaTableAll,chart1,drillButtonSave,runScriptdrillDown,runScriptdrillDownAll,drillButtonAll,saveProjects];
+
+ var components = [selectPopulation,selectProjectName,selectAgencyName,selectDataElements,selectResultOption,dynaTable,total_count,datepicker1,datepicker2,button,scheduleSDate,scheduleEDate,modal_save,runScript,selectClientAttr,drillButton,drillDynaTable,chart1,drillButtonSave,runScriptdrillDown, saveProjects];
 
 dashboard.init(components);
 
@@ -1560,14 +1146,6 @@ if(t1.indexOf("{run_now_drillDown}") >= 0){
   dashboard.setVariable('run_now_drillDown','false');
 } else {
   dashboard.setVariable('run_now_drillDown',t1.replace(/'/g,''));
-}
-
-var t2 = "${run_now_drillDown_all}";
-
-if(t2.indexOf("{run_now_drillDown_all}") >= 0){
-  dashboard.setVariable('run_now_drillDown_all','false');
- } else {
-  dashboard.setVariable('run_now_drillDown_all',t2.replace(/'/g,''));
 }
 
 jQuery("#main").on('click','#convertToBar',function(event){
@@ -1684,8 +1262,10 @@ jQuery("#main").on('click','#convertToDonut',function(event){
     Dashboard.setVariable('baseChart',newCharts);
 });
 
+
+
 $(document).ready(function(){
-		
+
     $('#pcni-sub-menu').find('.form-inline').addClass('hidden');
     if(window.DashboardGlobals.fileIsFavourite)
         {
@@ -1694,25 +1274,21 @@ $(document).ready(function(){
         }
     //$('#back').hide();
     $('#wrap2').hide();
-	//$('#total_count').hide();
 
-	//$(".edit_description").attr('maxlength','5');
-	
     $("#run").click(function(e) {
 	    dashboard.setVariable('run_now','true');
 		$("#total_count").show();
 	   //getChart();
         return false;
     });
-	
-	$("#back").on('click', 'a',function(e) {
-        $('#main-report, #drilldown-report, #drilldown-report-all').addClass('hidden');
+
+    $("#back").on('click', 'a',function(e) {
+        $('#main-report, #drilldown-report').addClass('hidden')
         $('#wrap').show();
 		$('#total_count').hide();
         $('#wrap1').hide();
         $('#toolbar').hide();
         $('#wrap2').hide();
-		$('#wrap3').hide();
         $('#drill').hide();
         $('#page-title').html('New Report');
         dashboard.setVariable('drillDown','false');
@@ -1724,8 +1300,7 @@ $(document).ready(function(){
         dashboard.setVariable('run_now','true');
         dashboard.setVariable('drillDown','false');
         dashboard.setVariable('run_now_drillDown','false');
-		$('#getAllInfo').show();
-		$('#total_count').show();
+		$('#total-count').show();
         return false;
     });
 
@@ -1735,47 +1310,27 @@ $(document).ready(function(){
         if(format === 'csv'){
             if(dashboard.getVariable('drillDown') == 'true'){
                 var dataToSend = {
-                    cdisplay_org : Dashboard.getVariable('cdisplay_org'),
+                    cdisplay : Dashboard.getVariable('cdisplay'),
                     rowHeader : Dashboard.getVariable('rowHeader'),
                     colHeader : Dashboard.getVariable('colHeader'),
                     Akey : Dashboard.getVariable('Akey'),
                     PKey : Dashboard.getVariable('PKey'),
                     sDate : Dashboard.getVariable('sDate'),
                     eDate : Dashboard.getVariable('eDate'),
-					CODE_KEY : Dashboard.getVariable('CODE_KEY'),
-					coc : Dashboard.getVariable('coc'),
-                    map:20,
+                    map:8,
                     dir: window.DashboardGlobals.folderpath
                 }
 				
-            } else if(dashboard.getVariable('drillDown_all') == 'true'){
+            } else {
                 var dataToSend = {
-					dataelements : Dashboard.getVariable('dataelements'),
-                    Akey : Dashboard.getVariable('Akey'),
-                    PKey : Dashboard.getVariable('PKey'),
-					result_option : Dashboard.getVariable('result_option'),
-					cdisplay_org_all : Dashboard.getVariable('cdisplay_org_all'),
-                    sDate : Dashboard.getVariable('sDate'),
-                    eDate : Dashboard.getVariable('eDate'),
-					CODE_KEY : Dashboard.getVariable('CODE_KEY'),
-					coc : Dashboard.getVariable('coc'),
-                    map:18,
-                    dir: window.DashboardGlobals.folderpath
-                }
-				
-            } 
-			else {
-                var dataToSend = { 
+                    dataelements:Dashboard.getVariable('dataelements'),
+                    RESULTOPTIONS:Dashboard.getVariable('RESULTOPTIONS'),
                     Akey:Dashboard.getVariable('Akey'),
                     PKey:Dashboard.getVariable('PKey'),
-					CODE_KEY:Dashboard.getVariable('CODE_KEY'),
-					coc:Dashboard.getVariable('coc'),
-					dataelements:Dashboard.getVariable('dataelements'),
-                    result_option:Dashboard.getVariable('result_option'),
                     sDate:Dashboard.getVariable('sDate'),
                     eDate:Dashboard.getVariable('eDate'),
                     DYNATABLE:Dashboard.getVariable('DYNATABLE'),
-                    map:19,
+                    map:6,
                     dir: window.DashboardGlobals.folderpath
                  }
 				
@@ -1805,7 +1360,6 @@ $(document).ready(function(){
 
             $('#scheduleButton').off().one('click', function() {
                 var jsonScheduleData = $('#scheduling-form').serializeObject();
-				// console.log('schedule option data : '+jsonScheduleData);
                 Dashboard.setVariable('scheduleopts',jsonScheduleData);
                 $('#scheduling-modal').modal('hide');
             });
@@ -1857,47 +1411,27 @@ $(document).ready(function(){
                 formats.push('csv');
                 if(dashboard.getVariable('drillDown') == 'true'){
                     var csvToSend = {
-                        cdisplay_org : Dashboard.getVariable('cdisplay_org'),
+                        cdisplay : Dashboard.getVariable('cdisplay'),
                         rowHeader : Dashboard.getVariable('rowHeader'),
                         colHeader : Dashboard.getVariable('colHeader'),
                         Akey : Dashboard.getVariable('Akey'),
                         PKey : Dashboard.getVariable('PKey'),
                         sDate : Dashboard.getVariable('sDate'),
                         eDate : Dashboard.getVariable('eDate'),
-						CODE_KEY : Dashboard.getVariable('CODE_KEY'),
-						coc : Dashboard.getVariable('coc'),
-                        map:20,
+                        map:8,
                         dir: window.DashboardGlobals.folderpath
                     }
 					
-                } else if(dashboard.getVariable('drillDown_all') == 'true'){
-					var csvToSend = {
-					dataelements : Dashboard.getVariable('dataelements'),
-                    Akey : Dashboard.getVariable('Akey'),
-                    PKey : Dashboard.getVariable('PKey'),
-					result_option : Dashboard.getVariable('result_option'),
-					cdisplay_org_all : Dashboard.getVariable('cdisplay_org_all'),
-                    sDate : Dashboard.getVariable('sDate'),
-                    eDate : Dashboard.getVariable('eDate'),
-					CODE_KEY : Dashboard.getVariable('CODE_KEY'),
-					coc : Dashboard.getVariable('coc'),
-                    map:18,
-                    dir: window.DashboardGlobals.folderpath
-                }
-				
-            }  
-				else {
-                    var csvToSend = {    
+                } else {
+                    var csvToSend = {
+                        dataelements:Dashboard.getVariable('dataelements'),
+                        RESULTOPTIONS:Dashboard.getVariable('RESULTOPTIONS'),
                         Akey:Dashboard.getVariable('Akey'),
                         PKey:Dashboard.getVariable('PKey'),
-						CODE_KEY:Dashboard.getVariable('CODE_KEY'),
-						coc:Dashboard.getVariable('coc'),
-						dataelements:Dashboard.getVariable('dataelements'),
-                        result_option:Dashboard.getVariable('result_option'),
                         sDate:Dashboard.getVariable('sDate'),
                         eDate:Dashboard.getVariable('eDate'),
                         DYNATABLE:Dashboard.getVariable('DYNATABLE'),
-                        map:19,
+                        map:6,
                         dir: window.DashboardGlobals.folderpath
                      }
 					
@@ -1911,9 +1445,7 @@ $(document).ready(function(){
                     return false;
                 }
                 var scheduleopts = dashboard.getVariable('scheduleopts');
-                scheduleopts.ScheduledTime = "20:26:00";
-				var reportDesc = $('#reportDesc').val();
-				//console.log("inside schedule : "+JSON.stringify(scheduleopts));
+                scheduleopts.ScheduledTime = "04:00:00";
 
                 var subject = $('#email-subject').val(),
                     body = $('#email-body').val();
@@ -1934,13 +1466,11 @@ $(document).ready(function(){
 
                 var parameters = {
                     dataelements:Dashboard.getVariable('dataelements'),
-                    result_option:Dashboard.getVariable('result_option'),
+                    RESULTOPTIONS:Dashboard.getVariable('RESULTOPTIONS'),
                     Akey:Dashboard.getVariable('Akey'),
                     PKey:Dashboard.getVariable('PKey'),
                     sDate:Dashboard.getVariable('sDate'),
                     eDate:Dashboard.getVariable('eDate'),
-					CODE_KEY:Dashboard.getVariable('CODE_KEY'),
-					coc:Dashboard.getVariable('coc'),
                     run_now:'true',
                     format:Dashboard.getVariable('format'),
                     projectParam:Dashboard.getVariable('projectParam'),
@@ -1955,7 +1485,6 @@ $(document).ready(function(){
                     location:"DataQualityReport/My Library/Report Templates - Data Quality",
                     EmailSettings: JSON.stringify(emailSettings),
                     ScheduleOptions: JSON.stringify(scheduleopts),
-					reportDesc: reportDesc,
                     isActive: true
                 };
 
@@ -2008,37 +1537,29 @@ $(document).ready(function(){
 
     $('#tb-save').click(function(e){
 
-        //var reportName = false;
-		//var reportDescription = "for test";
+        /*var reportName = false;
 
-        /*bootbox.prompt('Please give a name for your report', function(result){
+        bootbox.prompt('Please give a name for your report', function(result){
             if (result === null || result === ''){
 
             } else {
                     var parameters = {
                         dataelements:Dashboard.getVariable('dataelements'),
-                        result_option:Dashboard.getVariable('result_option'),
+                        RESULTOPTIONS:Dashboard.getVariable('RESULTOPTIONS'),
                         Akey:Dashboard.getVariable('Akey'),
                         PKey:Dashboard.getVariable('PKey'),
                         sDate:Dashboard.getVariable('sDate'),
                         eDate:Dashboard.getVariable('eDate'),
-						CODE_KEY:Dashboard.getVariable('CODE_KEY'),
-						coc:Dashboard.getVariable('coc'),
                         run_now:'true',
                         projectParam:Dashboard.getVariable('projectParam'),
                         projectNames: Dashboard.getVariable('projectNames')
                     };
 
                 if(dashboard.getVariable('drillDown') ==='true') {
-                        parameters.cdisplay_org = Dashboard.getVariable('cdisplay_org');
+                        parameters.cdisplay = Dashboard.getVariable('cdisplay');
                         parameters.rowHeader = Dashboard.getVariable('rowHeader');
                         parameters.colHeader = Dashboard.getVariable('colHeader');
                         parameters.run_now_drillDown ='true';
-                }
-				
-				if(dashboard.getVariable('drillDown_all') ==='true') {
-                        parameters.cdisplay_org_all = Dashboard.getVariable('cdisplay_org_all');
-                        parameters.run_now_drillDown_all ='true';
                 }
 
                 var postJSON = {
@@ -2046,7 +1567,6 @@ $(document).ready(function(){
                     reportName: result,
                     reportDirectory:window.DashboardGlobals.folderpath,
                     reportFile:window.DashboardGlobals.file,
-					reportDesc:reportDescription,
                     location:"DataQualityReport/My Library/Report Templates - Data Quality",
                 };
 
@@ -2061,7 +1581,7 @@ $(document).ready(function(){
                 });
             }
         });*/
-		$('#saveModal').modal('show');
+				$('#saveModal').modal('show');
 		$('#modal_submit').click(function(result) {
 			$('#saveModal').modal('hide');
 			var reportName = $('#nameReport').val();
@@ -2069,30 +1589,23 @@ $(document).ready(function(){
 			 if (result === null || result === ''){
 
             }else {
-			var parameters = {
+                    var parameters = {
                         dataelements:Dashboard.getVariable('dataelements'),
-                        result_option:Dashboard.getVariable('result_option'),
+                        RESULTOPTIONS:Dashboard.getVariable('RESULTOPTIONS'),
                         Akey:Dashboard.getVariable('Akey'),
                         PKey:Dashboard.getVariable('PKey'),
                         sDate:Dashboard.getVariable('sDate'),
                         eDate:Dashboard.getVariable('eDate'),
-						CODE_KEY:Dashboard.getVariable('CODE_KEY'),
-						coc:Dashboard.getVariable('coc'),
                         run_now:'true',
                         projectParam:Dashboard.getVariable('projectParam'),
                         projectNames: Dashboard.getVariable('projectNames')
                     };
 
                 if(dashboard.getVariable('drillDown') ==='true') {
-                        parameters.cdisplay_org = Dashboard.getVariable('cdisplay_org');
+                        parameters.cdisplay = Dashboard.getVariable('cdisplay');
                         parameters.rowHeader = Dashboard.getVariable('rowHeader');
                         parameters.colHeader = Dashboard.getVariable('colHeader');
                         parameters.run_now_drillDown ='true';
-                }
-				
-				if(dashboard.getVariable('drillDown_all') ==='true') {
-                        parameters.cdisplay_org_all = Dashboard.getVariable('cdisplay_org_all');
-                        parameters.run_now_drillDown_all ='true';
                 }
 
                 var postJSON = {
@@ -2116,9 +1629,12 @@ $(document).ready(function(){
 			}
 		});
         e.preventDefault();
+
+        e.preventDefault();
     });
 	
-	$('#tb-convert-to-charts').click(function(e) {
+	
+    $('#tb-convert-to-charts').click(function(e) {
 
         if ($(this).hasClass('disabled')) return false;
 
@@ -2139,18 +1655,7 @@ $(document).ready(function(){
         dashboard.setVariable('run_now_drillDown','true');
 		$("#total_count").hide();
    });
-   
-   $('#getAllInfo').click(function() {
-		//dashboard.setVariable('run_now_drillDown_all','true');
-		$("#selectClientAttr").removeClass('hidden');
-		$('#clientAttr_all').modal('show');
-	});
-   
-	$('#runDrillDown_all').click(function() {
-		dashboard.setVariable('run_now_drillDown_all','true');
-		$("#total_count").hide();
-	});
-	 
+      
     return false;
 });
 
