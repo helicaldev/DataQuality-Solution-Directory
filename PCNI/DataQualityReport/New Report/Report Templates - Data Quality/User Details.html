@@ -1,0 +1,444 @@
+<script src="/pcni/js/project/jquery.dynatable.js"></script>
+<script src="/pcni/js/project/c3.js"></script>
+<script src="/pcni/js/project/dp_test.js"></script>
+<link rel="stylesheet" type="text/css" href="/pcni/css/project/c3.css">
+<style type="text/css">
+th a {
+  color: #fff;
+}
+th a:hover {
+  color: #fff;
+  text-decoration: underline;
+}
+
+.dynatable-search {
+  float: right;
+  margin-bottom: 10px;
+}
+
+.dynatable-pagination-links {
+  float: right;
+}
+
+.dynatable-record-count {
+  display: block;
+  padding: 5px 0;
+}
+
+.dynatable-pagination-links span,
+.dynatable-pagination-links li {
+  display: inline-block;
+}
+
+.dynatable-page-link,
+.dynatable-page-break {
+  display: block;
+  padding: 5px 7px;
+}
+
+.dynatable-page-link {
+  cursor: pointer;
+}
+
+.dynatable-active-page,
+.dynatable-disabled-page {
+  cursor: text;
+}
+.dynatable-active-page:hover,
+.dynatable-disabled-page:hover {
+  text-decoration: none;
+}
+
+.dynatable-active-page {
+  background: #71AF5A;
+  border-radius: 5px;
+  color: #fff;
+}
+.dynatable-active-page:hover {
+  color: #fff;
+}
+.dynatable-disabled-page,
+.dynatable-disabled-page:hover {
+  background: none;
+  color: #999;
+}
+th a {
+  color: #fff;
+}
+th a:hover {
+  color: #fff;
+  text-decoration: underline;
+}
+
+.dynatable-search {
+  float: right;
+  margin-bottom: 10px;
+}
+
+.dynatable-pagination-links {
+  float: right;
+}
+
+.dynatable-record-count {
+  display: block;
+  padding: 5px 0;
+}
+
+.dynatable-pagination-links span,
+.dynatable-pagination-links li {
+  display: inline-block;
+}
+
+.dynatable-page-link,
+.dynatable-page-break {
+  display: block;
+  padding: 5px 7px;
+}
+
+.dynatable-page-link {
+  cursor: pointer;
+}
+
+.dynatable-active-page,
+.dynatable-disabled-page {
+  cursor: text;
+}
+.dynatable-active-page:hover,
+.dynatable-disabled-page:hover {
+  text-decoration: none;
+}
+
+.dynatable-active-page {
+  background: #71AF5A;
+  border-radius: 5px;
+  color: #fff;
+}
+.dynatable-active-page:hover {
+  color: #fff;
+}
+.dynatable-disabled-page,
+.dynatable-disabled-page:hover {
+  background: none;
+  color: #999;
+}
+
+.dynatable-head {
+        background-color: #cccccc;
+}
+
+svg{
+        cursor: pointer;
+}
+
+
+.bar {
+    fill: #c0c0c0;
+
+}
+
+
+.btn-success {
+        background-color: #e6e6e6;
+        border-color: black;
+        color: black;
+}
+.btn-success.active,
+.btn-success:active,
+.btn-success:focus,
+.btn-success.hover,
+.open >
+.dropdown-
+toggle.btn-success {
+ background-color: #e6e6e6;
+ border-color:black;
+ color: black;
+ }
+
+.btn-hover {
+background-color:#e6e6e6;
+}
+
+.form-control {
+    border-color:black;
+}
+
+#chart_4 {
+    border-color:black;
+    border:none;
+}
+#chart_5 {
+    border-color:black;
+    border:none;
+}
+.panel > .table-bordered > tbody > tr:first-child > td, .panel > .table-bordered > tbody > tr:first-child > th, .panel > .table-bordered > tbody > tr:last-child > td, .panel > .table-bordered > tbody > tr:last-child > th, .panel > .table-bordered > tfoot > tr:last-child > td, .panel > .table-bordered > tfoot > tr:last-child > th, .panel > .table-bordered > thead > tr:first-child > td, .panel > .table-bordered > thead > tr:first-child > th, .panel > .table-responsive > .table-bordered > tbody > tr:first-child > td, .panel > .table-responsive > .table-bordered > tbody > tr:first-child > th, .panel > .table-responsive > .table-bordered > tbody > tr:last-child > td, .panel > .table-responsive > .table-bordered > tbody > tr:last-child > th, .panel > .table-responsive > .table-bordered > tfoot > tr:last-child > td, .panel > .table-responsive > .table-bordered > tfoot > tr:last-child > th, .panel > .table-responsive > .table-bordered > thead > tr:first-child > td, .panel > .table-responsive > .table-bordered > thead > tr:first-child > th {
+        border-bottom: 1px solid;
+        border-right: 1px solid;
+        border-left:1px solid;
+        border-top:1px solid;
+}
+
+
+.dynatable-sort-header {
+color:black;
+}
+
+.table-striped > tbody > tr:nth-child(2n+1) > td, .table-striped > tbody > tr:nth-child(2n+1) > th {
+        background-color: white;
+}
+
+
+.panel > .table-bordered > tbody > tr > td:last-child, .panel > .table-bordered > tbody > tr > th:last-child, .panel > .table-bordered > tfoot > tr > td:last-child, .panel > .table-bordered > tfoot > tr > th:last-child, .panel > .table-bordered > thead > tr > td:last-child, .panel > .table-bordered > thead > tr > th:last-child, .panel > .table-responsive > .table-bordered > tbody > tr > td:last-child, .panel > .table-responsive > .table-bordered > tbody > tr > th:last-child, .panel > .table-responsive > .table-bordered > tfoot > tr > td:last-child, .panel > .table-responsive > .table-bordered > tfoot > tr > th:last-child, .panel > .table-responsive > .table-bordered > thead > tr > td:last-child, .panel > .table-responsive > .table-bordered > thead > tr > th:last-child {
+        border-right: 1px solid;
+}
+
+.panel > .table-bordered > tbody > tr > td:first-child, .panel > .table-bordered > tbody > tr > th:first-child, .panel > .table-bordered > tfoot > tr > td:first-child, .panel > .table-bordered > tfoot > tr > th:first-child, .panel > .table-bordered > thead > tr > td:first-child, .panel > .table-bordered > thead > tr > th:first-child, .panel > .table-responsive > .table-bordered > tbody > tr > td:first-child, .panel > .table-responsive > .table-bordered > tbody > tr > th:first-child, .panel > .table-responsive > .table-bordered > tfoot > tr > td:first-child, .panel > .table-responsive > .table-bordered > tfoot > tr > th:first-child, .panel > .table-responsive > .table-bordered > thead > tr > td:first-child, .panel > .table-responsive > .table-bordered > thead > tr > th:first-child {
+        border-left: 1px solid;
+}
+.table-striped > tbody > tr:nth-child(2n+1) > td, .table-striped > tbody > tr:nth-child(2n+1) > th {
+        background-color: white;
+        border: 1px solid;
+}
+.table-striped > tbody > tr:nth-child(2n+1) > td, .table-striped > tbody > tr:nth-child(2n+1) > th {
+        background-color: #f9f9f9;
+}
+
+.table-bordered, .table-bordered > tbody > tr > td, .table-bordered > tbody > tr > th, .table-bordered > tfoot > tr > td, .table-bordered > tfoot > tr > th, .table-bordered > thead > tr > td, .table-bordered > thead > tr > th {
+        border: 1px solid;
+}
+
+.block{
+    display: block;
+    width: 100%;
+    color: #000;
+    font-size: 32px;
+    text-align: center;
+}
+
+.text-padding{
+    padding: 10px;
+}
+
+.text-left{
+    text-align: left !important;
+}
+
+#scheduleBtn {
+    background:#e6e6e6;
+    border-color:black;
+    color:black;
+}
+
+.selectpicker {
+    border-color:black;
+}
+
+.modal-body {
+    position: relative;
+    overflow-y: auto;
+    max-height: 400px;
+    padding: 15px;
+}
+
+#projectSelector ul {
+    padding: 0;
+    margin: 0;
+    list-style: none;
+}
+
+#toolbar div{
+    text-align: center;
+}
+
+#toolbar a{
+    color: #222;
+}
+
+#tb-convert-to-charts.disabled{
+    color: #aaa;
+}
+
+@media print{
+  .alert-info, .dynatable-per-page, .dynatable-search{
+    display: none !important;
+  }
+s
+  .breadcrumb a {
+    color: #222;
+  }
+}
+
+@media screen{
+    #projectSelector li:nth-child(n+3){
+        display: none;
+    }
+}
+</style>
+
+<div class="container">
+    <div class="row">
+        <ol class="breadcrumb">
+            <li id="back"><a href="#">Template</a></li>
+            <li id="main-report" class="hidden"><a href="#">Main Report</a></li>
+            <li id="drilldown-report" class="hidden">Drilldown Report</li>
+        </ol>
+    </div>
+    <div class="row">
+        <!-- <h3 class="bg-success text-padding"><span class="fa fa-bar-chart-o"></span> New Report
+  <span class="fa fa-arrow-left hidden-print" id="back"></span></h3>
+    </div> -->
+    <div class="row hidden-print" style="display: none;" id="toolbar">
+        <div class="dropdown col-xs-2">
+              <button type="button" data-toggle="dropdown" class="btn btn-default" style="border:none;">
+                <span class="fa fa-download fa-2x"></span>
+                <span class="caret"></span>
+              </button>
+                <ul class="dropdown-menu" role="menu" id="tb-export">
+                    <li><a href="#" data-format="pdf">Export PDF</a></li>
+                    <li><a href="#" data-format="csv">Export CSV</a></li>
+                </ul>
+            </div>
+        <div class="col-xs-2">
+            <a href="#" id="tb-save"><span class="fa fa-floppy-o  fa-2x"></span></a>
+        </div>
+        <div class="col-xs-2">
+            <a href="#" id="tb-print-pdf"><span class="fa fa-print fa-2x"></span></a>
+        </div>
+        <div class="col-xs-2">
+            <a href="#" id="tb-convert-to-charts">
+                <span class="fa fa-bar-chart-o fa-2x"></span>
+            </a>
+        </div>
+        <div class="col-xs-2">
+            <a href="#" id="tb-email">
+                <span class="fa fa-envelope fa-2x"></span>
+            </a>
+        </div>
+        <div class="col-xs-2">
+            <a href="#">
+                <span id="favSelection" class="fa fa-star-o fa-2x"></span>
+            </a>
+        </div>
+    </div>
+    <div class="row" style="display:none;" id = "info">
+        <div class="col-sm-6">
+            <div class="form-horizontal">
+                <div class="form-group">
+                    <label class="col-xs-4">Run Date :</label>
+                    <label class="col-xs-8" id="runDate"></label>
+                </div>
+                <div class="form-group">
+                    <label class="col-xs-4">Run By :</label>
+                    <label class="col-xs-8" id = "runBy"></label>
+                </div>
+                <div class="form-group">
+                    <label class="col-xs-4">Reporting Period :</label>
+                    <label class="col-xs-8" id = "reportingPeriod"></label>
+                </div>
+            </div>
+        </div>
+        <div class="col-sm-6">
+            <div class="form-horizontal">
+                <div class="form-group">
+                    <label class="col-xs-4">Project Selection(s):</label>
+                    <div class="col-xs-8" id="projectSelector">
+                        <ul></ul>
+                        <a href="#" class="hidden-print">More</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="row" id="wrap1"></div>
+
+    <div class="row" id="wrap">
+    </div>
+
+</div>
+<!--  scheduling - modal-->
+<div class="modal fade" id="saveModal" class="" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+	 <div class="modal-dialog">
+		<div class="modal-content">
+			<div class="modal-header">
+				<h4 class="modal-title" id="modalTitle">Please give a name and description for your report</h4>
+			</div>
+			<div class="modal-body">
+				<div class="form-group">
+					 <div class="col-sm-12">
+                            <input type="text" class="form-control" id="nameReport" name="nameReport" placeholder = "Enter name">
+                     </div>
+					 <div class = "col-sm-12"></div>
+					 <div class="col-sm-12">
+                             <input type="text" class="form-control" maxlength="100" id="descReport" name="descReport" placeholder = "Enter Description">
+                     </div>
+				</div>
+			</div>
+			<div class="modal-footer">
+				<div class="form-group">
+					<div id="modal_submit" class="col-sm-3 col-sm-offset-9"></div>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+
+<div id="queryResult"></div>
+
+<script>
+ var dashboard = Dashboard;
+     dashboard.resetAll();
+
+var dynaTable = {
+    name: "dynaTable",
+    type:"chart",
+	map: 22,
+    htmlElementId : "#wrap",
+    executeAtStart: true,
+	customScript: function(data)
+	{
+		
+		var data2 = [];
+			for(var i = 0; i< data.length; i++){
+					var temp={};
+					for (var key in data[i]){
+						if( data[i].hasOwnProperty(key)) {
+								temp[key.toLowerCase()] = data[i][key];
+								}
+							}
+							data2.push(temp);
+						}
+			  
+					  data = data2;
+					  delete data2;
+					 
+				$("#wrap").addClass('panel').addClass('panel-primary');
+
+				var table = $('<table id="chart_4_table" class="table table-bordered table-striped"><thead><tr></tr></thead><tbody></tbody></table>');
+
+				for (key in data[0]){
+					table.find('thead tr').append('<th>' + key + '</th>');
+				}
+
+				$('#wrap').append(table);
+
+				var dynatable = $('#chart_4_table').dynatable({
+				  table :{
+					defaultColumnIdStyle : 'lowercase'
+				  },
+				  dataset: {
+					records: data
+				  }
+				}).data('dynatable');
+
+
+				$("#toolbar").removeClass('hidden');
+
+	}
+};
+
+ var components = [dynaTable];
+
+dashboard.init(components);
+
+//run_now variable
+
+</script>

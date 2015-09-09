@@ -1,7 +1,7 @@
-<script src="/PCNI/js/project/jquery.dynatable.js"></script>
-<script src="/PCNI/js/project/c3.js"></script>
-<script src="/PCNI/js/project/dp_test.js"></script>
-<link rel="stylesheet" type="text/css" href="/PCNI/css/project/c3.css">
+<script src="/pcni/js/project/jquery.dynatable.js"></script>
+<script src="/pcni/js/project/c3.js"></script>
+<script src="/pcni/js/project/dp_test.js"></script>
+<link rel="stylesheet" type="text/css" href="/pcni/css/project/c3.css">
 <style type="text/css">
 th a {
   color: #fff;
@@ -565,7 +565,7 @@ color:black;
          var agency_key = "${Akey}";
 
          if(agency_key.indexOf("{Akey}") >= 0){
-          dashboard.setVariable('Akey',['82']);
+          dashboard.setVariable('Akey',['960']);
          }
          else{
           dashboard.setVariable('Akey',agency_key.replace(/'/g,'').split(','));
@@ -748,8 +748,8 @@ var selectProjectName = {
     listeners:["Akey"],
     options:{
         multiple:true,
-        value : 'PKey',
-        display : 'Project',
+        value : 'PKEY',
+        display : 'PROJECT',
         placeholder: 'Select Project'
     },
     requestParameters:{
@@ -768,8 +768,8 @@ var selectAgencyName = {
 	listeners:["uid"],
     options:{
         multiple:true,
-        value : 'Akey',
-        display : 'Agency',
+        value : 'AKEY',
+        display : 'AGENCY',
         placeholder: 'Select Agency'
     },
 	requestParameters:{
@@ -829,8 +829,8 @@ var selectDataElementsGroups = {
     parameters : ["did"],
     options:{
         multiple:true,
-        value : 'did',
-        display : 'dGroup'
+        value : 'DID',
+        display : 'DGROUP'
     },
     htmlElementId : "#dataElementsGrps",
     executeAtStart: true,
@@ -844,8 +844,8 @@ var selectDataElements = {
 	listeners:["did"],
     options:{
         multiple:true,
-        value : 'dataelements',
-        display : 'dataelements'
+        value : 'DATAELEMENTS',
+        display : 'DATAELEMENTS'
     },
 	requestParameters:{
     did:"did",
@@ -862,8 +862,8 @@ var selectResultOption = {
     parameters :["Rkey"],
     options:{
         multiple:true,
-        value : 'Rkey',
-        display : 'ResultOptions',
+        value : 'RKEY',
+        display : 'RESULTOPTIONS',
     },
     htmlElementId : "#resultOptions",
     executeAtStart: true,
@@ -1542,6 +1542,8 @@ var saveProjects = {
 };
  
  var components = [selectProjectName,selectAgencyName,selectProjType,selectClientLoc,selectDataElementsGroups,selectDataElements,selectResultOption,getResultOption,dynaTable,modal_save,total_count,datepicker1,datepicker2,button,scheduleSDate,scheduleEDate,runScript,selectClientAttr,selectClientAttrAll,drillButton,getClientAttr,drillDynaTable,getClientAttr_all,drillDynaTableAll,chart1,drillButtonSave,runScriptdrillDown,runScriptdrillDownAll,drillButtonAll,saveProjects];
+ 
+ /*var components = [selectAgencyName,selectProjectName,selectProjType,datepicker1,datepicker2,selectClientLoc,selectDataElementsGroups,selectDataElements,selectResultOption,button];*/
 
 dashboard.init(components);
 
@@ -1911,7 +1913,7 @@ $(document).ready(function(){
                     return false;
                 }
                 var scheduleopts = dashboard.getVariable('scheduleopts');
-                scheduleopts.ScheduledTime = "20:26:00";
+                scheduleopts.ScheduledTime = "15:06:00";
 				var reportDesc = $('#reportDesc').val();
 				//console.log("inside schedule : "+JSON.stringify(scheduleopts));
 
