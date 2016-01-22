@@ -1,491 +1,580 @@
--- --------------------------------------------------------
--- Host:                         173.194.107.15
--- Server version:               5.5.44 - (Google)
--- Server OS:                    Linux
--- HeidiSQL Version:             8.3.0.4694
--- --------------------------------------------------------
-
-/*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
-/*!40101 SET NAMES utf8 */;
-/*!40014 SET @OLD_FOREIGN_KEY_CHECKS=@@FOREIGN_KEY_CHECKS, FOREIGN_KEY_CHECKS=0 */;
-/*!40101 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='NO_AUTO_VALUE_ON_ZERO' */;
-
--- Dumping database structure for OPENHMIS2
-CREATE DATABASE IF NOT EXISTS `OPENHMIS2` /*!40100 DEFAULT CHARACTER SET utf8 */;
-USE `OPENHMIS2`;
-
-
--- Dumping structure for procedure OPENHMIS2.programInfoDrillDownAll
-DELIMITER //
-CREATE DEFINER=`root`@`%` PROCEDURE `programInfoDrillDownAll`(IN `dataelemId` VARCHAR(500), IN `a_key` VARCHAR(50), IN `p_key` VARCHAR(50), IN `resultsOpt` VARCHAR(500), IN `param_cols` VARCHAR(600), IN `startDate` VARCHAR(50), IN `endDate` VARCHAR(50), IN `project_type_code` VARCHAR(100), IN `cockey` VARCHAR(50))
+create or replace procedure programInfoDrillDownAll(cur OUT sys_refcursor,rowId IN varchar2,resultsOpt IN varchar2,startDate IN varchar2,endDate IN varchar2,param_cols IN varchar2,a_key IN varchar2,p_key IN VARCHAR2,type_key IN VARCHAR2,coc_key IN varchar2)
+IS
+	queryRace varchar2(2000);
+	queryGender varchar2(2000);
+	queryEthnicity varchar2(2000);
+	queryVeteran varchar2(2000);
+	queryFname varchar2(2000);
+	queryLname varchar2(2000);
+	queryDob varchar2(2000);
+	queryPhyDis varchar2(2000);
+	queryDomVio varchar2(2000);
+	queryMntlHlth varchar2(2000);
+	queryHIV varchar2(2000);
+	querySubstnce varchar2(2000);
+	queryIncomeEntry varchar2(2000);
+	queryIncomeExit varchar2(2000);
+	queryChronic varchar2(2000);
+	queryHousingSts varchar2(2000);
+	queryNonCashEntry varchar2(2000);
+	queryNonCashExit varchar2(2000);
+	queryZip varchar(2000);
+	queryRes varchar2(2000);
+	a varchar2(500);
+	innerQuery varchar2(30000);
+	akey varchar2(500);
+	pkey varchar2(500);
+	typekey varchar2(500);
+	cockey varchar2(500);
+	code varchar2(100);
+	codeD varchar2(100);
+	codeR varchar2(100);
+	
 BEGIN
-       DECLARE a varchar(65535);
-       DECLARE akey varchar(65535);
-       DECLARE pkey varchar(65535);
-	   DECLARE type_code varchar(65535);
-	   DECLARE coc_key varchar(65535);
-       DECLARE rowId varchar(65535);
-       DECLARE queryRace varchar(65535);
-	   DECLARE queryGender varchar(65535);
-       DECLARE queryEthnicity varchar(65535);
-	   DECLARE queryVetSts varchar(65535);
-	   DECLARE queryPhyDis varchar(65535);
-       DECLARE queryChronicHltCond varchar(65535);
-       DECLARE queryHivAids varchar(65535);
-	   DECLARE queryMentlHlth varchar(65535);
-       DECLARE querySubstncAbs varchar(65535);
-       DECLARE queryDomstcViolnc varchar(65535);
-       DECLARE queryHousngSts varchar(65535);
-       DECLARE queryDateOfBirth varchar(65535);
-       DECLARE queryFirstName varchar(65535);
-       DECLARE queryLastName varchar(65535);
-       DECLARE queryZip varchar(65535);
-       DECLARE queryRes varchar(65535);
-       DECLARE queryIncomeEntry varchar(65535);
-       DECLARE queryIncomeExit varchar(65535);
-       DECLARE queryBenefitsEntry varchar(65535);
-       DECLARE queryBenefitsExit varchar(65535);
-       DECLARE innerQuery varchar(65535);
-       DECLARE code varchar(65535);
-       DECLARE codeD varchar(65535);
-       DECLARE codeR varchar(65535);
-	    set a = REPLACE(param_cols,'\'','');
-       set akey = REPLACE(a_key,'\'','');
-       set pkey = REPLACE(p_key,'\'','');
-	   set type_code = REPLACE(project_type_code,'\'','');
-	   set coc_key = REPLACE(cockey,'\'','');
-       set rowId = REPLACE(dataelemId,'\'','');
-       
-       set innerQuery = '';
-       set code = '';
-       set codeD = '8';
-       set codeR = '9';
-       IF (INSTR(rowId,'Race')) THEN
-       	set codeD = CONCAT(codeD,',','15');
+	code := 0;
+	codeD := '8';
+	codeR := '9';
+	
+	akey := a_key;
+	pkey := p_key;
+	typekey := type_key;
+	cockey := coc_key;
+	
+	IF (INSTR(rowId,'Race') > 0) THEN
+       	codeD := codeD || ',' || '15';
 
       END IF;
        
-       IF (INSTR(rowId,'Race')) THEN
-				set codeR = CONCAT(codeR,',','16');
+       IF (INSTR(rowId,'Race') > 0) THEN
+				codeR := codeR || ',' || '16';
       END IF;
       
-       IF(INSTR(resultsOpt,'Dont Know')) THEN
-       		set code = CONCAT(code,codeD);
+       IF(INSTR(resultsOpt,'Dont Know') > 0) THEN
+       		code := code || ',' || codeD;
 
       END IF;
 	  
-	  IF(INSTR(resultsOpt, 'Refused')) THEN
+	  IF(INSTR(resultsOpt, 'Refused') > 0) THEN
 	  	 
-          IF(LENGTH(code)=0) THEN
-            set code = CONCAT(code,codeR);
+          IF(code is null) THEN
+            code := code || ',' || codeR;
           ELSE
-          set code = CONCAT(code,',',codeR);
+			code := codeD || ',' || codeR;
           END IF;
 
      END IF;
-	   
-	   set queryRace = CONCAT('select ',a,' from (select C.CLIENT_KEY as \'Client Key\',C.NAME_FIRST as \'First Name\',C.NAME_LAST as \'Last Name\',DATE_FORMAT(C.ENTRY_DATE_TIME,\'%m-%d-%Y\') as \'Project Entry Date\',C.ENTRY_USER_KEY as \'Entering User Key\',DATE_FORMAT(C.LOG_DATE_TIME,\'%m-%d-%Y\') as \'Project Exit Date\',(select CG.DESCRIPTION FROM CODE_GENDER CG WHERE CG.CODE_KEY = C.GENDER_CODE) as Gender,(select CE.DESCRIPTION FROM CODE_ETHNICITY CE WHERE CE.CODE_KEY = C.ETHNICITY_CODE) as Ethnicity,(select CGe.DESCRIPTION FROM CODE_GENERAL CGe WHERE CGe.CODE_KEY = C.VETERAN_STATUS_GCT) as \'Veteran Status\',(select COR.DESCRIPTION FROM CODE_RACE COR,CLIENT_RACE CR WHERE C.CLIENT_KEY = CR.CLIENT_KEY AND COR.CODE_KEY = CR.RACE_CODE)as Race,(case when C.DATE_OF_BIRTH is null then \'\' else DATE_FORMAT(C.DATE_OF_BIRTH,\'%m-%d-%Y\') end) as \'Date Of Birth\'
-      FROM CLIENT C,CLIENT_RACE CR,CODE_RACE COR,PROJECT_PARTICIPATION PP,PROJECT P, AGENCY A
-      WHERE
-      C.CLIENT_KEY=CR.CLIENT_KEY AND
-      CR.RACE_CODE = COR.CODE_KEY AND
-      C.CLIENT_KEY=PP.CLIENT_KEY AND
-      P.PROJECT_KEY = PP.PROJECT_KEY AND
-      A.AGENCY_KEY = P.AGENCY_KEY AND
-      CR.RACE_CODE in (',code,') AND
-      PP.REC_ACTIVE_GCT = 1 AND
-      (A.AGENCY_KEY IN(',akey,') OR \'-1\' IN(',akey,')) AND
-      (P.PROJECT_KEY IN(',pkey,') OR \'-1\' IN(',pkey,')) AND
-	  (P.PROJECT_TYPE_CODE IN(',type_code,') OR \'-1\' IN(',type_code,')) AND
-	  (P.COC_GROUP_KEY IN(',coc_key,') OR \'-1\' IN(',coc_key,')) AND
-      PP.ENTRY_DATE <= \'',endDate,'\' AND
-      PP.EXIT_DATE >= \'',startDate,'\') b');
-	  
-	  set queryGender = CONCAT('select ',a,' from (select C.CLIENT_KEY as \'Client Key\',C.NAME_FIRST as \'First Name\',C.NAME_LAST as \'Last Name\',DATE_FORMAT(C.ENTRY_DATE_TIME,\'%m-%d-%Y\') as \'Project Entry Date\',C.ENTRY_USER_KEY as \'Entering User Key\',DATE_FORMAT(C.LOG_DATE_TIME,\'%m-%d-%Y\') as \'Project Exit Date\',(select CG.DESCRIPTION FROM CODE_GENDER CG WHERE CG.CODE_KEY = C.GENDER_CODE) as Gender,(select CE.DESCRIPTION FROM CODE_ETHNICITY CE WHERE CE.CODE_KEY = C.ETHNICITY_CODE) as Ethnicity,(select CGe.DESCRIPTION FROM CODE_GENERAL CGe WHERE CGe.CODE_KEY = C.VETERAN_STATUS_GCT) as \'Veteran Status\',(select COR.DESCRIPTION FROM CODE_RACE COR,CLIENT_RACE CR WHERE C.CLIENT_KEY = CR.CLIENT_KEY AND COR.CODE_KEY = CR.RACE_CODE)as Race,(case when C.DATE_OF_BIRTH is null then \'\' else DATE_FORMAT(C.DATE_OF_BIRTH,\'%m-%d-%Y\') end) as \'Date Of Birth\'
-      from CLIENT C,CODE_GENDER CG,PROJECT_PARTICIPATION PP,PROJECT P, AGENCY A
-      WHERE
-      C.GENDER_CODE = CG.CODE_KEY AND
-      C.CLIENT_KEY = PP.CLIENT_KEY AND
-      P.PROJECT_KEY = PP.PROJECT_KEY AND
-      A.AGENCY_KEY = P.AGENCY_KEY AND
-      C.GENDER_CODE in (',code,') AND
-      PP.REC_ACTIVE_GCT = 1 AND
-      (A.AGENCY_KEY IN(',akey,') OR \'-1\' IN(',akey,')) AND
-      (P.PROJECT_KEY IN(',pkey,') OR \'-1\' IN(',pkey,')) AND
-	  (P.PROJECT_TYPE_CODE IN(',type_code,') OR \'-1\' IN(',type_code,')) AND
-	  (P.COC_GROUP_KEY IN(',coc_key,') OR \'-1\' IN(',coc_key,')) AND
-      PP.ENTRY_DATE <= \'',endDate,'\' AND
-      PP.EXIT_DATE >= \'',startDate,'\') b');
-	  
-	  set queryEthnicity = CONCAT('select ',a,' from (select C.CLIENT_KEY as \'Client Key\',C.NAME_FIRST as \'First Name\',C.NAME_LAST as \'Last Name\',DATE_FORMAT(C.ENTRY_DATE_TIME,\'%m-%d-%Y\') as \'Project Entry Date\',C.ENTRY_USER_KEY as \'Entering User Key\',DATE_FORMAT(C.LOG_DATE_TIME,\'%m-%d-%Y\') as \'Project Exit Date\',(select CG.DESCRIPTION FROM CODE_GENDER CG WHERE CG.CODE_KEY = C.GENDER_CODE) as Gender,(select CE.DESCRIPTION FROM CODE_ETHNICITY CE WHERE CE.CODE_KEY = C.ETHNICITY_CODE) as Ethnicity,(select CGe.DESCRIPTION FROM CODE_GENERAL CGe WHERE CGe.CODE_KEY = C.VETERAN_STATUS_GCT) as \'Veteran Status\',(select COR.DESCRIPTION FROM CODE_RACE COR,CLIENT_RACE CR WHERE C.CLIENT_KEY = CR.CLIENT_KEY AND COR.CODE_KEY = CR.RACE_CODE)as Race,(case when C.DATE_OF_BIRTH is null then \'\' else DATE_FORMAT(C.DATE_OF_BIRTH,\'%m-%d-%Y\') end) as \'Date Of Birth\'
-      from CLIENT C,CODE_ETHNICITY CE,PROJECT_PARTICIPATION PP,PROJECT P, AGENCY A
-      WHERE
-      CE.CODE_KEY = C.ETHNICITY_CODE AND
-      C.CLIENT_KEY=PP.CLIENT_KEY AND
-      P.PROJECT_KEY = PP.PROJECT_KEY AND
-      A.AGENCY_KEY = P.AGENCY_KEY AND
-      C.ETHNICITY_CODE in (',code,') AND
-      PP.REC_ACTIVE_GCT = 1 AND
-      (A.AGENCY_KEY IN(',akey,') OR \'-1\' IN(',akey,')) AND
-      (P.PROJECT_KEY IN(',pkey,') OR \'-1\' IN(',pkey,')) AND
-	  (P.PROJECT_TYPE_CODE IN(',type_code,') OR \'-1\' IN(',type_code,')) AND
-	  (P.COC_GROUP_KEY IN(',coc_key,') OR \'-1\' IN(',coc_key,')) AND
-      PP.ENTRY_DATE <= \'',endDate,'\' AND
-      PP.EXIT_DATE >= \'',startDate,'\') b');
-	  
-	  set queryVetSts = CONCAT('select ',a,' from (select C.CLIENT_KEY as \'Client Key\',C.NAME_FIRST as \'First Name\',C.NAME_LAST as \'Last Name\',DATE_FORMAT(C.ENTRY_DATE_TIME,\'%m-%d-%Y\') as \'Project Entry Date\',C.ENTRY_USER_KEY as \'Entering User Key\',DATE_FORMAT(C.LOG_DATE_TIME,\'%m-%d-%Y\') as \'Project Exit Date\',(select CG.DESCRIPTION FROM CODE_GENDER CG WHERE CG.CODE_KEY = C.GENDER_CODE) as Gender,(select CE.DESCRIPTION FROM CODE_ETHNICITY CE WHERE CE.CODE_KEY = C.ETHNICITY_CODE) as Ethnicity,(select CGe.DESCRIPTION FROM CODE_GENERAL CGe WHERE CGe.CODE_KEY = C.VETERAN_STATUS_GCT) as \'Veteran Status\',(select COR.DESCRIPTION FROM CODE_RACE COR,CLIENT_RACE CR WHERE C.CLIENT_KEY = CR.CLIENT_KEY AND COR.CODE_KEY = CR.RACE_CODE)as Race,(case when C.DATE_OF_BIRTH is null then \'\' else DATE_FORMAT(C.DATE_OF_BIRTH,\'%m-%d-%Y\') end) as \'Date Of Birth\'
-      from CLIENT C,CODE_GENERAL CGe,PROJECT_PARTICIPATION PP,PROJECT P, AGENCY A
-      WHERE
-      CGe.CODE_KEY = C.VETERAN_STATUS_GCT AND
-      C.CLIENT_KEY=PP.CLIENT_KEY AND
-      P.PROJECT_KEY = PP.PROJECT_KEY AND
-      A.AGENCY_KEY = P.AGENCY_KEY AND
-      C.VETERAN_STATUS_GCT in (',code,') AND
-      PP.REC_ACTIVE_GCT = 1 AND
-      (A.AGENCY_KEY IN(',akey,') OR \'-1\' IN(',akey,')) AND
-      (P.PROJECT_KEY IN(',pkey,') OR \'-1\' IN(',pkey,')) AND
-	  (P.PROJECT_TYPE_CODE IN(',type_code,') OR \'-1\' IN(',type_code,')) AND
-	  (P.COC_GROUP_KEY IN(',coc_key,') OR \'-1\' IN(',coc_key,')) AND
-      PP.ENTRY_DATE <= \'',endDate,'\' AND
-      PP.EXIT_DATE >= \'',startDate,'\') b');
-	  
-	  set queryPhyDis = CONCAT('select ',a,' from (select C.CLIENT_KEY as \'Client Key\',C.NAME_FIRST as \'First Name\',C.NAME_LAST as \'Last Name\',DATE_FORMAT(C.ENTRY_DATE_TIME,\'%m-%d-%Y\') as \'Project Entry Date\',C.ENTRY_USER_KEY as \'Entering User Key\',DATE_FORMAT(C.LOG_DATE_TIME,\'%m-%d-%Y\') as \'Project Exit Date\',(select CG.DESCRIPTION FROM CODE_GENDER CG WHERE CG.CODE_KEY = C.GENDER_CODE) as Gender,(select CE.DESCRIPTION FROM CODE_ETHNICITY CE WHERE CE.CODE_KEY = C.ETHNICITY_CODE) as Ethnicity,(select CGe.DESCRIPTION FROM CODE_GENERAL CGe WHERE CGe.CODE_KEY = C.VETERAN_STATUS_GCT) as \'Veteran Status\',(select COR.DESCRIPTION FROM CODE_RACE COR,CLIENT_RACE CR WHERE C.CLIENT_KEY = CR.CLIENT_KEY AND COR.CODE_KEY = CR.RACE_CODE)as Race,(case when C.DATE_OF_BIRTH is null then \'\' else DATE_FORMAT(C.DATE_OF_BIRTH,\'%m-%d-%Y\') end) as \'Date Of Birth\'
-      from CLIENT C,CODE_GENERAL CGe,CLIENT_DISABILITIES CDs,PROJECT_PARTICIPATION PP,PROJECT P, AGENCY A
-      WHERE
-      C.CLIENT_KEY = CDs.CLIENT_KEY AND
-      C.CLIENT_KEY = PP.CLIENT_KEY AND
-      (A.AGENCY_KEY IN(',akey,') OR \'-1\' IN(',akey,')) AND
-      (P.PROJECT_KEY IN(',pkey,') OR \'-1\' IN(',pkey,')) AND
-	  (P.PROJECT_TYPE_CODE IN(',type_code,') OR \'-1\' IN(',type_code,')) AND
-	  (P.COC_GROUP_KEY IN(',coc_key,') OR \'-1\' IN(',coc_key,')) AND
-      CGe.CODE_KEY = CDs.PHYSICAL_GCT AND
-      CDs.PHYSICAL_GCT in (',code,') AND
-      PP.REC_ACTIVE_GCT = 1 AND
-      A.AGENCY_KEY IN(',akey,') AND
-      P.PROJECT_KEY IN(',pkey,') AND
-      PP.ENTRY_DATE <= \'',endDate,'\' AND
-      PP.EXIT_DATE >= \'',startDate,'\') b');
-	  
-	  set queryChronicHltCond = CONCAT('select ',a,' from (select C.CLIENT_KEY as \'Client Key\',C.NAME_FIRST as \'First Name\',C.NAME_LAST as \'Last Name\',DATE_FORMAT(C.ENTRY_DATE_TIME,\'%m-%d-%Y\') as \'Project Entry Date\',C.ENTRY_USER_KEY as \'Entering User Key\',DATE_FORMAT(C.LOG_DATE_TIME,\'%m-%d-%Y\') as \'Project Exit Date\',(select CG.DESCRIPTION FROM CODE_GENDER CG WHERE CG.CODE_KEY = C.GENDER_CODE) as Gender,(select CE.DESCRIPTION FROM CODE_ETHNICITY CE WHERE CE.CODE_KEY = C.ETHNICITY_CODE) as Ethnicity,(select CGe.DESCRIPTION FROM CODE_GENERAL CGe WHERE CGe.CODE_KEY = C.VETERAN_STATUS_GCT) as \'Veteran Status\',(select COR.DESCRIPTION FROM CODE_RACE COR,CLIENT_RACE CR WHERE C.CLIENT_KEY = CR.CLIENT_KEY AND COR.CODE_KEY = CR.RACE_CODE)as Race,(case when C.DATE_OF_BIRTH is null then \'\' else DATE_FORMAT(C.DATE_OF_BIRTH,\'%m-%d-%Y\') end) as \'Date Of Birth\'
-      from CLIENT C,CODE_GENERAL CGe,CLIENT_DISABILITIES CDs,PROJECT_PARTICIPATION PP,PROJECT P, AGENCY A
-      WHERE
-      C.CLIENT_KEY = CDs.CLIENT_KEY AND
-      C.CLIENT_KEY=PP.CLIENT_KEY AND
-      (A.AGENCY_KEY IN(',akey,') OR \'-1\' IN(',akey,')) AND
-      (P.PROJECT_KEY IN(',pkey,') OR \'-1\' IN(',pkey,')) AND
-	  (P.PROJECT_TYPE_CODE IN(',type_code,') OR \'-1\' IN(',type_code,')) AND
-	  (P.COC_GROUP_KEY IN(',coc_key,') OR \'-1\' IN(',coc_key,')) AND
-      CGe.CODE_KEY = CDs.CHRONIC_HEALTH_COND_GCT AND
-      CDs.CHRONIC_HEALTH_COND_GCT in (',code,') AND
-      PP.REC_ACTIVE_GCT = 1 AND
-      A.AGENCY_KEY IN(',akey,') AND
-      P.PROJECT_KEY IN(',pkey,') AND
-      PP.ENTRY_DATE <= \'',endDate,'\' AND
-      PP.EXIT_DATE >= \'',startDate,'\') b');
-	  
-	  set queryHivAids = CONCAT('select ',a,' from (select C.CLIENT_KEY as \'Client Key\',C.NAME_FIRST as \'First Name\',C.NAME_LAST as \'Last Name\',DATE_FORMAT(C.ENTRY_DATE_TIME,\'%m-%d-%Y\') as \'Project Entry Date\',C.ENTRY_USER_KEY as \'Entering User Key\',DATE_FORMAT(C.LOG_DATE_TIME,\'%m-%d-%Y\') as \'Project Exit Date\',(select CG.DESCRIPTION FROM CODE_GENDER CG WHERE CG.CODE_KEY = C.GENDER_CODE) as Gender,(select CE.DESCRIPTION FROM CODE_ETHNICITY CE WHERE CE.CODE_KEY = C.ETHNICITY_CODE) as Ethnicity,(select CGe.DESCRIPTION FROM CODE_GENERAL CGe WHERE CGe.CODE_KEY = C.VETERAN_STATUS_GCT) as \'Veteran Status\',(select COR.DESCRIPTION FROM CODE_RACE COR,CLIENT_RACE CR WHERE C.CLIENT_KEY = CR.CLIENT_KEY AND COR.CODE_KEY = CR.RACE_CODE)as Race,(case when C.DATE_OF_BIRTH is null then \'\' else DATE_FORMAT(C.DATE_OF_BIRTH,\'%m-%d-%Y\') end) as \'Date Of Birth\'
-      from CLIENT C,CODE_GENERAL CGe,CLIENT_DISABILITIES CDs,PROJECT_PARTICIPATION PP,PROJECT P, AGENCY A
-      WHERE
-      C.CLIENT_KEY = CDs.CLIENT_KEY AND
-      C.CLIENT_KEY=PP.CLIENT_KEY AND
-      P.PROJECT_KEY = PP.PROJECT_KEY AND
-      A.AGENCY_KEY = P.AGENCY_KEY AND
-      CGe.CODE_KEY = CDs.HIVAIDS_GCT AND
-      CDs.HIVAIDS_GCT in (',code,') AND
-      PP.REC_ACTIVE_GCT = 1 AND
-     (A.AGENCY_KEY IN(',akey,') OR \'-1\' IN(',akey,')) AND
-      (P.PROJECT_KEY IN(',pkey,') OR \'-1\' IN(',pkey,')) AND
-	  (P.PROJECT_TYPE_CODE IN(',type_code,') OR \'-1\' IN(',type_code,')) AND
-	  (P.COC_GROUP_KEY IN(',coc_key,') OR \'-1\' IN(',coc_key,')) AND
-      PP.ENTRY_DATE <= \'',endDate,'\' AND
-      PP.EXIT_DATE >= \'',startDate,'\') b');
-	  
-	  set queryMentlHlth = CONCAT('select ',a,' from (select C.CLIENT_KEY as \'Client Key\',C.NAME_FIRST as \'First Name\',C.NAME_LAST as \'Last Name\',DATE_FORMAT(C.ENTRY_DATE_TIME,\'%m-%d-%Y\') as \'Project Entry Date\',C.ENTRY_USER_KEY as \'Entering User Key\',DATE_FORMAT(C.LOG_DATE_TIME,\'%m-%d-%Y\') as \'Project Exit Date\',(select CG.DESCRIPTION FROM CODE_GENDER CG WHERE CG.CODE_KEY = C.GENDER_CODE) as Gender,(select CE.DESCRIPTION FROM CODE_ETHNICITY CE WHERE CE.CODE_KEY = C.ETHNICITY_CODE) as Ethnicity,(select CGe.DESCRIPTION FROM CODE_GENERAL CGe WHERE CGe.CODE_KEY = C.VETERAN_STATUS_GCT) as \'Veteran Status\',(select COR.DESCRIPTION FROM CODE_RACE COR,CLIENT_RACE CR WHERE C.CLIENT_KEY = CR.CLIENT_KEY AND COR.CODE_KEY = CR.RACE_CODE)as Race,(case when C.DATE_OF_BIRTH is null then \'\' else DATE_FORMAT(C.DATE_OF_BIRTH,\'%m-%d-%Y\') end) as \'Date Of Birth\'
-      from CLIENT C,CODE_GENERAL CGe,CLIENT_DISABILITIES CDs,PROJECT_PARTICIPATION PP,PROJECT P, AGENCY A
-      WHERE
-      C.CLIENT_KEY = CDs.CLIENT_KEY AND
-      C.CLIENT_KEY=PP.CLIENT_KEY AND
-      P.PROJECT_KEY = PP.PROJECT_KEY AND
-      A.AGENCY_KEY = P.AGENCY_KEY AND
-      CGe.CODE_KEY = CDs.MENTAL_HEALTH_GCT AND
-      CDs.MENTAL_HEALTH_GCT in (',code,') AND
-      PP.REC_ACTIVE_GCT = 1 AND
-      (A.AGENCY_KEY IN(',akey,') OR \'-1\' IN(',akey,')) AND
-      (P.PROJECT_KEY IN(',pkey,') OR \'-1\' IN(',pkey,')) AND
-	  (P.PROJECT_TYPE_CODE IN(',type_code,') OR \'-1\' IN(',type_code,')) AND
-	  (P.COC_GROUP_KEY IN(',coc_key,') OR \'-1\' IN(',coc_key,')) AND
-      PP.ENTRY_DATE <= \'',endDate,'\' AND
-      PP.EXIT_DATE >= \'',startDate,'\') b');
-	  
-	  set querySubstncAbs = CONCAT('select ',a,' from (select C.CLIENT_KEY as \'Client Key\',C.NAME_FIRST as \'First Name\',C.NAME_LAST as \'Last Name\',DATE_FORMAT(C.ENTRY_DATE_TIME,\'%m-%d-%Y\') as \'Project Entry Date\',C.ENTRY_USER_KEY as \'Entering User Key\',DATE_FORMAT(C.LOG_DATE_TIME,\'%m-%d-%Y\') as \'Project Exit Date\',(select CG.DESCRIPTION FROM CODE_GENDER CG WHERE CG.CODE_KEY = C.GENDER_CODE) as Gender,(select CE.DESCRIPTION FROM CODE_ETHNICITY CE WHERE CE.CODE_KEY = C.ETHNICITY_CODE) as Ethnicity,(select CGe.DESCRIPTION FROM CODE_GENERAL CGe WHERE CGe.CODE_KEY = C.VETERAN_STATUS_GCT) as \'Veteran Status\',(select COR.DESCRIPTION FROM CODE_RACE COR,CLIENT_RACE CR WHERE C.CLIENT_KEY = CR.CLIENT_KEY AND COR.CODE_KEY = CR.RACE_CODE)as Race,(case when C.DATE_OF_BIRTH is null then \'\' else DATE_FORMAT(C.DATE_OF_BIRTH,\'%m-%d-%Y\') end) as \'Date Of Birth\'
-      from CLIENT C,CODE_GENERAL CGe,CLIENT_DISABILITIES CDs,PROJECT_PARTICIPATION PP,PROJECT P, AGENCY A
-      WHERE
-      C.CLIENT_KEY = CDs.CLIENT_KEY AND
-      C.CLIENT_KEY=PP.CLIENT_KEY AND
-      P.PROJECT_KEY = PP.PROJECT_KEY AND
-      A.AGENCY_KEY = P.AGENCY_KEY AND
-      CGe.CODE_KEY = CDs.SUBSTANCE_ABUSE_CODE AND
-      CDs.SUBSTANCE_ABUSE_CODE in (',code,') AND
-      PP.REC_ACTIVE_GCT = 1 AND
-      (A.AGENCY_KEY IN(',akey,') OR \'-1\' IN(',akey,')) AND
-      (P.PROJECT_KEY IN(',pkey,') OR \'-1\' IN(',pkey,')) AND
-	  (P.PROJECT_TYPE_CODE IN(',type_code,') OR \'-1\' IN(',type_code,')) AND
-	  (P.COC_GROUP_KEY IN(',coc_key,') OR \'-1\' IN(',coc_key,')) AND
-      PP.ENTRY_DATE <= \'',endDate,'\' AND
-      PP.EXIT_DATE >= \'',startDate,'\') b');
-	  
-	  set queryDomstcViolnc = CONCAT('select ',a,' from (select C.CLIENT_KEY as \'Client Key\',C.NAME_FIRST as \'First Name\',C.NAME_LAST as \'Last Name\',DATE_FORMAT(C.ENTRY_DATE_TIME,\'%m-%d-%Y\') as \'Project Entry Date\',C.ENTRY_USER_KEY as \'Entering User Key\',DATE_FORMAT(C.LOG_DATE_TIME,\'%m-%d-%Y\') as \'Project Exit Date\',(select CG.DESCRIPTION FROM CODE_GENDER CG WHERE CG.CODE_KEY = C.GENDER_CODE) as Gender,(select CE.DESCRIPTION FROM CODE_ETHNICITY CE WHERE CE.CODE_KEY = C.ETHNICITY_CODE) as Ethnicity,(select CGe.DESCRIPTION FROM CODE_GENERAL CGe WHERE CGe.CODE_KEY = C.VETERAN_STATUS_GCT) as \'Veteran Status\',(select COR.DESCRIPTION FROM CODE_RACE COR,CLIENT_RACE CR WHERE C.CLIENT_KEY = CR.CLIENT_KEY AND COR.CODE_KEY = CR.RACE_CODE)as Race,(case when C.DATE_OF_BIRTH is null then \'\' else DATE_FORMAT(C.DATE_OF_BIRTH,\'%m-%d-%Y\') end) as \'Date Of Birth\'
-      from CLIENT C,CODE_GENERAL CGe,CLIENT_DISABILITIES CDs,PROJECT_PARTICIPATION PP,PROJECT P, AGENCY A
-      WHERE
-      C.CLIENT_KEY = CDs.CLIENT_KEY AND
-      C.CLIENT_KEY=PP.CLIENT_KEY AND
-      P.PROJECT_KEY = PP.PROJECT_KEY AND
-      A.AGENCY_KEY = P.AGENCY_KEY AND
-      CGe.CODE_KEY = CDs.DOMES_VIOLENCE_GCT AND
-      CDs.DOMES_VIOLENCE_GCT in (',code,') AND
-      PP.REC_ACTIVE_GCT = 1 AND
-      (A.AGENCY_KEY IN(',akey,') OR \'-1\' IN(',akey,')) AND
-      (P.PROJECT_KEY IN(',pkey,') OR \'-1\' IN(',pkey,')) AND
-	  (P.PROJECT_TYPE_CODE IN(',type_code,') OR \'-1\' IN(',type_code,')) AND
-	  (P.COC_GROUP_KEY IN(',coc_key,') OR \'-1\' IN(',coc_key,')) AND
-      PP.ENTRY_DATE <= \'',endDate,'\' AND
-      PP.EXIT_DATE >= \'',startDate,'\') b');
-	  
-	  set queryHousngSts = CONCAT('select ',a,' from (select C.CLIENT_KEY as \'Client Key\',C.NAME_FIRST as \'First Name\',C.NAME_LAST as \'Last Name\',DATE_FORMAT(C.ENTRY_DATE_TIME,\'%m-%d-%Y\') as \'Project Entry Date\',C.ENTRY_USER_KEY as \'Entering User Key\',DATE_FORMAT(C.LOG_DATE_TIME,\'%m-%d-%Y\') as \'Project Exit Date\',(select CG.DESCRIPTION FROM CODE_GENDER CG WHERE CG.CODE_KEY = C.GENDER_CODE) as Gender,(select CE.DESCRIPTION FROM CODE_ETHNICITY CE WHERE CE.CODE_KEY = C.ETHNICITY_CODE) as Ethnicity,(select CGe.DESCRIPTION FROM CODE_GENERAL CGe WHERE CGe.CODE_KEY = C.VETERAN_STATUS_GCT) as \'Veteran Status\',(select COR.DESCRIPTION FROM CODE_RACE COR,CLIENT_RACE CR WHERE C.CLIENT_KEY = CR.CLIENT_KEY AND COR.CODE_KEY = CR.RACE_CODE)as Race,(case when C.DATE_OF_BIRTH is null then \'\' else DATE_FORMAT(C.DATE_OF_BIRTH,\'%m-%d-%Y\') end) as \'Date Of Birth\'
-      from CLIENT C,CLIENT_HOUSEHOLD CH,CODE_GENERAL CGe,PROJECT_PARTICIPATION PP,PROJECT P, AGENCY A
-      WHERE
-      C.CLIENT_KEY=CH.CLIENT_KEY AND
-      CH.HOUSEHOLD_KEY = CGe.CODE_KEY AND
-      C.CLIENT_KEY=PP.CLIENT_KEY AND
-      P.PROJECT_KEY = PP.PROJECT_KEY AND
-      A.AGENCY_KEY = P.AGENCY_KEY AND
-      CH.HOUSEHOLD_KEY in (',code,') AND
-      PP.REC_ACTIVE_GCT = 1 AND
-      (A.AGENCY_KEY IN(',akey,') OR \'-1\' IN(',akey,')) AND
-      (P.PROJECT_KEY IN(',pkey,') OR \'-1\' IN(',pkey,')) AND
-	  (P.PROJECT_TYPE_CODE IN(',type_code,') OR \'-1\' IN(',type_code,')) AND
-	  (P.COC_GROUP_KEY IN(',coc_key,') OR \'-1\' IN(',coc_key,')) AND
-      PP.ENTRY_DATE <= \'',endDate,'\' AND
-      PP.EXIT_DATE >= \'',startDate,'\') b');
-	  
-	  set queryDateOfBirth = CONCAT('select ',a,' from (select C.CLIENT_KEY as \'Client Key\',C.NAME_FIRST as \'First Name\',C.NAME_LAST as \'Last Name\',DATE_FORMAT(C.ENTRY_DATE_TIME,\'%m-%d-%Y\') as \'Project Entry Date\',C.ENTRY_USER_KEY as \'Entering User Key\',DATE_FORMAT(C.LOG_DATE_TIME,\'%m-%d-%Y\') as \'Project Exit Date\',(select CG.DESCRIPTION FROM CODE_GENDER CG WHERE CG.CODE_KEY = C.GENDER_CODE) as Gender,(select CE.DESCRIPTION FROM CODE_ETHNICITY CE WHERE CE.CODE_KEY = C.ETHNICITY_CODE) as Ethnicity,(select CGe.DESCRIPTION FROM CODE_GENERAL CGe WHERE CGe.CODE_KEY = C.VETERAN_STATUS_GCT) as \'Veteran Status\',(select COR.DESCRIPTION FROM CODE_RACE COR,CLIENT_RACE CR WHERE C.CLIENT_KEY = CR.CLIENT_KEY AND COR.CODE_KEY = CR.RACE_CODE)as Race,(case when C.DATE_OF_BIRTH is null then \'\' else DATE_FORMAT(C.DATE_OF_BIRTH,\'%m-%d-%Y\') end) as \'Date Of Birth\'
-      from CLIENT C,PROJECT_PARTICIPATION PP,PROJECT P, AGENCY A,CODE_DOB_TYPE CDOB
-      WHERE
-      CDOB.CODE_KEY=C.DOB_TYPE_CODE AND
-      C.CLIENT_KEY=PP.CLIENT_KEY AND
-      P.PROJECT_KEY = PP.PROJECT_KEY AND
-      A.AGENCY_KEY = P.AGENCY_KEY AND
-      C.DOB_TYPE_CODE in (',code,') AND
-      PP.REC_ACTIVE_GCT = 1 AND
-      (A.AGENCY_KEY IN(',akey,') OR \'-1\' IN(',akey,')) AND
-      (P.PROJECT_KEY IN(',pkey,') OR \'-1\' IN(',pkey,')) AND
-	  (P.PROJECT_TYPE_CODE IN(',type_code,') OR \'-1\' IN(',type_code,')) AND
-	  (P.COC_GROUP_KEY IN(',coc_key,') OR \'-1\' IN(',coc_key,')) AND
-      PP.ENTRY_DATE <= \'',endDate,'\' AND
-      PP.EXIT_DATE >= \'',startDate,'\') b');
-      
-      set queryFirstName = CONCAT('select ',a,' from (select \'\' as \'Client Key\',\'\' as \'First Name\',\'\' as \'Last Name\',\'\' as \'Project Entry Date\',\'\' as \'Entering User Key\',\'\' as \'Project Exit Date\',\'\' as Gender,\'\' as Ethnicity,\'\' as \'Veteran Status\',\'\' as Race,\'\' as \'Date Of Birth\') b');
+	
+	innerQuery := '';
+	
+	queryRace := 'select '||param_cols||' from (select distinct C.CLIENT_KEY as "Client Key",C.FIRST_NAME as "First Name",C.LAST_NAME as "Last Name",C.DATE_OF_BIRTH as "Date Of Birth",(select CR.DESCRIPTION from PATHWAY.PATH_CODE_RACE CR where CR.CODE_KEY = C.RACE_KEY) as "Race",(select CG.GENDER from PATHWAY.PATH_CODE_GENDER CG WHERE CG.CODE_KEY = C.GENDER_KEY) as "Gender",(select CE.DESCRIPTION from PATHWAY.PATH_CODE_ETHNICITY CE where CE.CODE_KEY = C.ETHNICITY_KEY) as "Ethnicity",(select CV.DESCRIPTION from PATHWAY.PATH_CODE_VETERAN CV where CV.CODE_KEY = C.VETERAN) as "Veteran Status",PP.ENTRY_DATE as "Project Entry Date",PP.EXIT_DATE as "Project Exit Date",PP.CREATE_USER_KEY as "Entering User Key"
+					from PATHWAY.PATH_CLIENT C
+					LEFT JOIN PATHWAY.PATH_CLIENT_RACE CR ON C.RACE_KEY = CR.RACE_KEY
+					INNER JOIN PATHWAY.PATH_CLIENT_PROGRAM PP ON C.CLIENT_KEY = PP.CLIENT_KEY
+					INNER JOIN PATHWAY.PATH_CODE_HUD_PROGRAM P ON P.PROGRAM_KEY = PP.PROGRAM_NAME_KEY
+					INNER JOIN PATHWAY.PATH_AGENCY A ON P.AGENCY_KEY = A.AGENCY_KEY
+					INNER JOIN PATHWAY.PATH_CODE_PROGRAM_TYPE PT ON P.PROGRAM_TYPE_KEY = PT.CODE_KEY
+					INNER JOIN PATHWAY.PATH_PROGRAM_COC_LOCATION PC ON PC.PROGRAM_KEY = P.PROGRAM_KEY
+					WHERE CR.RACE_KEY IN ('||code||') AND
+					PP.REC_ACTIVE = ''A'' AND
+				  (A.AGENCY_KEY IN('||akey||') or -1 in ('||akey||')) AND
+				  (P.PROGRAM_KEY IN('||pkey||') or -1 in ('||pkey||')) AND
+				  (PT.CODE_KEY IN('||typekey||') or -1 in ('||typekey||')) AND
+				  (PC.PROGRAM_KEY IN('||cockey||') or -1 in ('||cockey||')) AND
+				   PP.ENTRY_DATE <= TO_DATE('''||endDate||''',''YYYY-MM-DD'') AND
+				   PP.EXIT_DATE >= TO_DATE('''||startDate||''',''YYYY-MM-DD'')) a';
+				   
+	queryGender := 'select '||param_cols||' from (select distinct C.CLIENT_KEY as "Client Key",C.FIRST_NAME as "First Name",C.LAST_NAME as "Last Name",C.DATE_OF_BIRTH as "Date Of Birth",(select CR.DESCRIPTION from PATHWAY.PATH_CODE_RACE CR where CR.CODE_KEY = C.RACE_KEY) as "Race",(select CG.GENDER from PATHWAY.PATH_CODE_GENDER CG WHERE CG.CODE_KEY = C.GENDER_KEY) as "Gender",(select CE.DESCRIPTION from PATHWAY.PATH_CODE_ETHNICITY CE where CE.CODE_KEY = C.ETHNICITY_KEY) as "Ethnicity",(select CV.DESCRIPTION from PATHWAY.PATH_CODE_VETERAN CV where CV.CODE_KEY = C.VETERAN) as "Veteran Status",PP.ENTRY_DATE as "Project Entry Date",PP.EXIT_DATE as "Project Exit Date",PP.CREATE_USER_KEY as "Entering User Key"
+					from PATHWAY.PATH_CLIENT C
+					INNER JOIN PATHWAY.PATH_CODE_GENDER CD ON C.GENDER_KEY = CD.CODE_KEY
+					INNER JOIN PATHWAY.PATH_CLIENT_PROGRAM PP ON C.CLIENT_KEY = PP.CLIENT_KEY
+					INNER JOIN PATHWAY.PATH_CODE_HUD_PROGRAM P ON P.PROGRAM_KEY = PP.PROGRAM_NAME_KEY
+					INNER JOIN PATHWAY.PATH_AGENCY A ON P.AGENCY_KEY = A.AGENCY_KEY
+					INNER JOIN PATHWAY.PATH_CODE_PROGRAM_TYPE PT ON P.PROGRAM_TYPE_KEY = PT.CODE_KEY
+					INNER JOIN PATHWAY.PATH_PROGRAM_COC_LOCATION PC ON PC.PROGRAM_KEY = P.PROGRAM_KEY
+					WHERE CD.CODE_KEY IN ('||code||') AND
+					PP.REC_ACTIVE = ''A'' AND
+				  (A.AGENCY_KEY IN('||akey||') or -1 in ('||akey||')) AND
+				  (P.PROGRAM_KEY IN('||pkey||') or -1 in ('||pkey||')) AND
+				  (PT.CODE_KEY IN('||typekey||') or -1 in ('||typekey||')) AND
+				  (PC.PROGRAM_KEY IN('||cockey||') or -1 in ('||cockey||')) AND
+				   PP.ENTRY_DATE <= TO_DATE('''||endDate||''',''YYYY-MM-DD'') AND
+				   PP.EXIT_DATE >= TO_DATE('''||startDate||''',''YYYY-MM-DD'')) a';
+	
+	queryEthnicity := 'select '||param_cols||' from (select distinct C.CLIENT_KEY as "Client Key",C.FIRST_NAME as "First Name",C.LAST_NAME as "Last Name",C.DATE_OF_BIRTH as "Date Of Birth",(select CR.DESCRIPTION from PATHWAY.PATH_CODE_RACE CR where CR.CODE_KEY = C.RACE_KEY) as "Race",(select CG.GENDER from PATHWAY.PATH_CODE_GENDER CG WHERE CG.CODE_KEY = C.GENDER_KEY) as "Gender",(select CE.DESCRIPTION from PATHWAY.PATH_CODE_ETHNICITY CE where CE.CODE_KEY = C.ETHNICITY_KEY) as "Ethnicity",(select CV.DESCRIPTION from PATHWAY.PATH_CODE_VETERAN CV where CV.CODE_KEY = C.VETERAN) as "Veteran Status",PP.ENTRY_DATE as "Project Entry Date",PP.EXIT_DATE as "Project Exit Date",PP.CREATE_USER_KEY as "Entering User Key"
+					from PATHWAY.PATH_CLIENT C
+					INNER JOIN PATHWAY.PATH_CODE_ETHNICITY CE ON C.ETHNICITY_KEY = CE.CODE_KEY
+					INNER JOIN PATHWAY.PATH_CLIENT_PROGRAM PP ON C.CLIENT_KEY = PP.CLIENT_KEY
+					INNER JOIN PATHWAY.PATH_CODE_HUD_PROGRAM P ON P.PROGRAM_KEY = PP.PROGRAM_NAME_KEY
+					INNER JOIN PATHWAY.PATH_AGENCY A ON P.AGENCY_KEY = A.AGENCY_KEY
+					INNER JOIN PATHWAY.PATH_CODE_PROGRAM_TYPE PT ON P.PROGRAM_TYPE_KEY = PT.CODE_KEY
+					INNER JOIN PATHWAY.PATH_PROGRAM_COC_LOCATION PC ON PC.PROGRAM_KEY = P.PROGRAM_KEY
+					WHERE CE.CODE_KEY IN ('||code||') AND
+					PP.REC_ACTIVE = ''A'' AND
+				  (A.AGENCY_KEY IN('||akey||') or -1 in ('||akey||')) AND
+				  (P.PROGRAM_KEY IN('||pkey||') or -1 in ('||pkey||')) AND
+				  (PT.CODE_KEY IN('||typekey||') or -1 in ('||typekey||')) AND
+				  (PC.PROGRAM_KEY IN('||cockey||') or -1 in ('||cockey||')) AND
+				   PP.ENTRY_DATE <= TO_DATE('''||endDate||''',''YYYY-MM-DD'') AND
+				   PP.EXIT_DATE >= TO_DATE('''||startDate||''',''YYYY-MM-DD'')) a';
+	
+	queryVeteran := 'select '||param_cols||' from (select distinct C.CLIENT_KEY as "Client Key",C.FIRST_NAME as "First Name",C.LAST_NAME as "Last Name",C.DATE_OF_BIRTH as "Date Of Birth",(select CR.DESCRIPTION from PATHWAY.PATH_CODE_RACE CR where CR.CODE_KEY = C.RACE_KEY) as "Race",(select CG.GENDER from PATHWAY.PATH_CODE_GENDER CG WHERE CG.CODE_KEY = C.GENDER_KEY) as "Gender",(select CE.DESCRIPTION from PATHWAY.PATH_CODE_ETHNICITY CE where CE.CODE_KEY = C.ETHNICITY_KEY) as "Ethnicity",(select CV.DESCRIPTION from PATHWAY.PATH_CODE_VETERAN CV where CV.CODE_KEY = C.VETERAN) as "Veteran Status",PP.ENTRY_DATE as "Project Entry Date",PP.EXIT_DATE as "Project Exit Date",PP.CREATE_USER_KEY as "Entering User Key"
+					from PATHWAY.PATH_CLIENT C
+					INNER JOIN PATHWAY.PATH_CODE_VETERAN CV ON C.VETERAN = CV.CODE_KEY
+					INNER JOIN PATHWAY.PATH_CLIENT_PROGRAM PP ON C.CLIENT_KEY = PP.CLIENT_KEY
+					INNER JOIN PATHWAY.PATH_CODE_HUD_PROGRAM P ON P.PROGRAM_KEY = PP.PROGRAM_NAME_KEY
+					INNER JOIN PATHWAY.PATH_AGENCY A ON P.AGENCY_KEY = A.AGENCY_KEY
+					INNER JOIN PATHWAY.PATH_CODE_PROGRAM_TYPE PT ON P.PROGRAM_TYPE_KEY = PT.CODE_KEY
+					INNER JOIN PATHWAY.PATH_PROGRAM_COC_LOCATION PC ON PC.PROGRAM_KEY = P.PROGRAM_KEY
+					WHERE CV.CODE_KEY IN ('||code||') AND
+					PP.REC_ACTIVE = ''A'' AND
+				  (A.AGENCY_KEY IN('||akey||') or -1 in ('||akey||')) AND
+				  (P.PROGRAM_KEY IN('||pkey||') or -1 in ('||pkey||')) AND
+				  (PT.CODE_KEY IN('||typekey||') or -1 in ('||typekey||')) AND
+				  (PC.PROGRAM_KEY IN('||cockey||') or -1 in ('||cockey||')) AND				   
+					PP.ENTRY_DATE <= TO_DATE('''||endDate||''',''YYYY-MM-DD'') AND
+				   PP.EXIT_DATE >= TO_DATE('''||startDate||''',''YYYY-MM-DD'')) a';
+	
+	queryFname := 'select '||param_cols||' from (select distinct C.CLIENT_KEY as "Client Key",C.FIRST_NAME as "First Name",C.LAST_NAME as "Last Name",C.DATE_OF_BIRTH as "Date Of Birth",(select CR.DESCRIPTION from PATHWAY.PATH_CODE_RACE CR where CR.CODE_KEY = C.RACE_KEY) as "Race",(select CG.GENDER from PATHWAY.PATH_CODE_GENDER CG WHERE CG.CODE_KEY = C.GENDER_KEY) as "Gender",(select CE.DESCRIPTION from PATHWAY.PATH_CODE_ETHNICITY CE where CE.CODE_KEY = C.ETHNICITY_KEY) as "Ethnicity",(select CV.DESCRIPTION from PATHWAY.PATH_CODE_VETERAN CV where CV.CODE_KEY = C.VETERAN) as "Veteran Status",PP.ENTRY_DATE as "Project Entry Date",PP.EXIT_DATE as "Project Exit Date",PP.CREATE_USER_KEY as "Entering User Key"
+					from PATHWAY.PATH_CLIENT C
+					INNER JOIN PATHWAY.PATH_CODE_NAME_TYPE CN ON C.NAME_TYPE = CN.CODE_KEY
+					INNER JOIN PATHWAY.PATH_CLIENT_PROGRAM PP ON C.CLIENT_KEY = PP.CLIENT_KEY
+					INNER JOIN PATHWAY.PATH_CODE_HUD_PROGRAM P ON P.PROGRAM_KEY = PP.PROGRAM_NAME_KEY
+					INNER JOIN PATHWAY.PATH_AGENCY A ON P.AGENCY_KEY = A.AGENCY_KEY
+					INNER JOIN PATHWAY.PATH_CODE_PROGRAM_TYPE PT ON P.PROGRAM_TYPE_KEY = PT.CODE_KEY
+					INNER JOIN PATHWAY.PATH_PROGRAM_COC_LOCATION PC ON PC.PROGRAM_KEY = P.PROGRAM_KEY
+					WHERE CN.CODE_KEY IN ('||code||') AND
+					PP.REC_ACTIVE = ''A'' AND
+				  (A.AGENCY_KEY IN('||akey||') or -1 in ('||akey||')) AND
+				  (P.PROGRAM_KEY IN('||pkey||') or -1 in ('||pkey||')) AND
+				  (PT.CODE_KEY IN('||typekey||') or -1 in ('||typekey||')) AND
+				  (PC.PROGRAM_KEY IN('||cockey||') or -1 in ('||cockey||')) AND
+				   PP.ENTRY_DATE <= TO_DATE('''||endDate||''',''YYYY-MM-DD'') AND
+				   PP.EXIT_DATE >= TO_DATE('''||startDate||''',''YYYY-MM-DD'')) a';
+	
+	queryLname := 'select '||param_cols||' from (select distinct C.CLIENT_KEY as "Client Key",C.FIRST_NAME as "First Name",C.LAST_NAME as "Last Name",C.DATE_OF_BIRTH as "Date Of Birth",(select CR.DESCRIPTION from PATHWAY.PATH_CODE_RACE CR where CR.CODE_KEY = C.RACE_KEY) as "Race",(select CG.GENDER from PATHWAY.PATH_CODE_GENDER CG WHERE CG.CODE_KEY = C.GENDER_KEY) as "Gender",(select CE.DESCRIPTION from PATHWAY.PATH_CODE_ETHNICITY CE where CE.CODE_KEY = C.ETHNICITY_KEY) as "Ethnicity",(select CV.DESCRIPTION from PATHWAY.PATH_CODE_VETERAN CV where CV.CODE_KEY = C.VETERAN) as "Veteran Status",PP.ENTRY_DATE as "Project Entry Date",PP.EXIT_DATE as "Project Exit Date",PP.CREATE_USER_KEY as "Entering User Key"
+					from PATHWAY.PATH_CLIENT C
+					INNER JOIN PATHWAY.PATH_CODE_NAME_TYPE CN ON C.NAME_TYPE = CN.CODE_KEY
+					INNER JOIN PATHWAY.PATH_CLIENT_PROGRAM PP ON C.CLIENT_KEY = PP.CLIENT_KEY
+					INNER JOIN PATHWAY.PATH_CODE_HUD_PROGRAM P ON P.PROGRAM_KEY = PP.PROGRAM_NAME_KEY
+					INNER JOIN PATHWAY.PATH_AGENCY A ON P.AGENCY_KEY = A.AGENCY_KEY
+					INNER JOIN PATHWAY.PATH_CODE_PROGRAM_TYPE PT ON P.PROGRAM_TYPE_KEY = PT.CODE_KEY
+					INNER JOIN PATHWAY.PATH_PROGRAM_COC_LOCATION PC ON PC.PROGRAM_KEY = P.PROGRAM_KEY
+					WHERE CN.CODE_KEY IN ('||code||') AND
+					PP.REC_ACTIVE = ''A'' AND
+				  (A.AGENCY_KEY IN('||akey||') or -1 in ('||akey||')) AND
+				  (P.PROGRAM_KEY IN('||pkey||') or -1 in ('||pkey||')) AND
+				  (PT.CODE_KEY IN('||typekey||') or -1 in ('||typekey||')) AND
+				  (PC.PROGRAM_KEY IN('||cockey||') or -1 in ('||cockey||')) AND
+				   PP.ENTRY_DATE <= TO_DATE('''||endDate||''',''YYYY-MM-DD'') AND
+				   PP.EXIT_DATE >= TO_DATE('''||startDate||''',''YYYY-MM-DD'')) a';
+				   
+	queryDob := 'select '||param_cols||' from (select distinct C.CLIENT_KEY as "Client Key",C.FIRST_NAME as "First Name",C.LAST_NAME as "Last Name",C.DATE_OF_BIRTH as "Date Of Birth",(select CR.DESCRIPTION from PATHWAY.PATH_CODE_RACE CR where CR.CODE_KEY = C.RACE_KEY) as "Race",(select CG.GENDER from PATHWAY.PATH_CODE_GENDER CG WHERE CG.CODE_KEY = C.GENDER_KEY) as "Gender",(select CE.DESCRIPTION from PATHWAY.PATH_CODE_ETHNICITY CE where CE.CODE_KEY = C.ETHNICITY_KEY) as "Ethnicity",(select CV.DESCRIPTION from PATHWAY.PATH_CODE_VETERAN CV where CV.CODE_KEY = C.VETERAN) as "Veteran Status",PP.ENTRY_DATE as "Project Entry Date",PP.EXIT_DATE as "Project Exit Date",PP.CREATE_USER_KEY as "Entering User Key"
+					from PATHWAY.PATH_CLIENT C
+					INNER JOIN PATHWAY.PATH_CODE_DOB_TYPE CD ON C.DOB_TYPE = CD.CODE_KEY
+					INNER JOIN PATHWAY.PATH_CLIENT_PROGRAM PP ON C.CLIENT_KEY = PP.CLIENT_KEY
+					INNER JOIN PATHWAY.PATH_CODE_HUD_PROGRAM P ON P.PROGRAM_KEY = PP.PROGRAM_NAME_KEY
+					INNER JOIN PATHWAY.PATH_AGENCY A ON P.AGENCY_KEY = A.AGENCY_KEY
+					INNER JOIN PATHWAY.PATH_CODE_PROGRAM_TYPE PT ON P.PROGRAM_TYPE_KEY = PT.CODE_KEY
+					INNER JOIN PATHWAY.PATH_PROGRAM_COC_LOCATION PC ON PC.PROGRAM_KEY = P.PROGRAM_KEY
+					WHERE CD.CODE_KEY IN ('||code||') AND
+					PP.REC_ACTIVE = ''A'' AND
+				  (A.AGENCY_KEY IN('||akey||') or -1 in ('||akey||')) AND
+				  (P.PROGRAM_KEY IN('||pkey||') or -1 in ('||pkey||')) AND
+				  (PT.CODE_KEY IN('||typekey||') or -1 in ('||typekey||')) AND
+				  (PC.PROGRAM_KEY IN('||cockey||') or -1 in ('||cockey||')) AND
+				   PP.ENTRY_DATE <= TO_DATE('''||endDate||''',''YYYY-MM-DD'') AND
+				   PP.EXIT_DATE >= TO_DATE('''||startDate||''',''YYYY-MM-DD'')) a';
+				   
+	queryPhyDis := 'select '||param_cols||' from (select distinct C.CLIENT_KEY as "Client Key",C.FIRST_NAME as "First Name",C.LAST_NAME as "Last Name",C.DATE_OF_BIRTH as "Date Of Birth",(select CR.DESCRIPTION from PATHWAY.PATH_CODE_RACE CR where CR.CODE_KEY = C.RACE_KEY) as "Race",(select CG.GENDER from PATHWAY.PATH_CODE_GENDER CG WHERE CG.CODE_KEY = C.GENDER_KEY) as "Gender",(select CE.DESCRIPTION from PATHWAY.PATH_CODE_ETHNICITY CE where CE.CODE_KEY = C.ETHNICITY_KEY) as "Ethnicity",(select CV.DESCRIPTION from PATHWAY.PATH_CODE_VETERAN CV where CV.CODE_KEY = C.VETERAN) as "Veteran Status",PP.ENTRY_DATE as "Project Entry Date",PP.EXIT_DATE as "Project Exit Date",PP.CREATE_USER_KEY as "Entering User Key"
+					from PATHWAY.PATH_CLIENT C
+					INNER JOIN PATHWAY.PATH_CLIENT_SPECIAL_NEEDS PD ON C.CLIENT_KEY = PD.CLIENT_KEY
+					INNER JOIN PATHWAY.PATH_CLIENT_PROGRAM PP ON C.CLIENT_KEY = PP.CLIENT_KEY
+					INNER JOIN PATHWAY.PATH_CODE_HUD_PROGRAM P ON P.PROGRAM_KEY = PP.PROGRAM_NAME_KEY
+					INNER JOIN PATHWAY.PATH_AGENCY A ON P.AGENCY_KEY = A.AGENCY_KEY
+					INNER JOIN PATHWAY.PATH_CODE_PROGRAM_TYPE PT ON P.PROGRAM_TYPE_KEY = PT.CODE_KEY
+					INNER JOIN PATHWAY.PATH_PROGRAM_COC_LOCATION PC ON PC.PROGRAM_KEY = P.PROGRAM_KEY
+					WHERE PD.NEEDS_CODE_KEY = 15 AND
+					PD.ANSWER_KEY IN ('||code||') AND
+					PP.REC_ACTIVE = ''A'' AND
+				  (A.AGENCY_KEY IN('||akey||') or -1 in ('||akey||')) AND
+				  (P.PROGRAM_KEY IN('||pkey||') or -1 in ('||pkey||')) AND
+				  (PT.CODE_KEY IN('||typekey||') or -1 in ('||typekey||')) AND
+				  (PC.PROGRAM_KEY IN('||cockey||') or -1 in ('||cockey||')) AND
+				   PP.ENTRY_DATE <= TO_DATE('''||endDate||''',''YYYY-MM-DD'') AND
+				   PP.EXIT_DATE >= TO_DATE('''||startDate||''',''YYYY-MM-DD'')) a';
+				   
+	queryMntlHlth := 'select '||param_cols||' from (select distinct C.CLIENT_KEY as "Client Key",C.FIRST_NAME as "First Name",C.LAST_NAME as "Last Name",C.DATE_OF_BIRTH as "Date Of Birth",(select CR.DESCRIPTION from PATHWAY.PATH_CODE_RACE CR where CR.CODE_KEY = C.RACE_KEY) as "Race",(select CG.GENDER from PATHWAY.PATH_CODE_GENDER CG WHERE CG.CODE_KEY = C.GENDER_KEY) as "Gender",(select CE.DESCRIPTION from PATHWAY.PATH_CODE_ETHNICITY CE where CE.CODE_KEY = C.ETHNICITY_KEY) as "Ethnicity",(select CV.DESCRIPTION from PATHWAY.PATH_CODE_VETERAN CV where CV.CODE_KEY = C.VETERAN) as "Veteran Status",PP.ENTRY_DATE as "Project Entry Date",PP.EXIT_DATE as "Project Exit Date",PP.CREATE_USER_KEY as "Entering User Key"
+					from PATHWAY.PATH_CLIENT C
+					INNER JOIN PATHWAY.PATH_CLIENT_SPECIAL_NEEDS PD ON C.CLIENT_KEY = PD.CLIENT_KEY
+					INNER JOIN PATHWAY.PATH_CLIENT_PROGRAM PP ON C.CLIENT_KEY = PP.CLIENT_KEY
+					INNER JOIN PATHWAY.PATH_CODE_HUD_PROGRAM P ON P.PROGRAM_KEY = PP.PROGRAM_NAME_KEY
+					INNER JOIN PATHWAY.PATH_AGENCY A ON P.AGENCY_KEY = A.AGENCY_KEY
+					INNER JOIN PATHWAY.PATH_CODE_PROGRAM_TYPE PT ON P.PROGRAM_TYPE_KEY = PT.CODE_KEY
+					INNER JOIN PATHWAY.PATH_PROGRAM_COC_LOCATION PC ON PC.PROGRAM_KEY = P.PROGRAM_KEY
+					WHERE PD.NEEDS_CODE_KEY = 11 AND
+					PD.ANSWER_KEY IN ('||code||') AND
+					PP.REC_ACTIVE = ''A'' AND
+				 (A.AGENCY_KEY IN('||akey||') or -1 in ('||akey||')) AND
+				  (P.PROGRAM_KEY IN('||pkey||') or -1 in ('||pkey||')) AND
+				  (PT.CODE_KEY IN('||typekey||') or -1 in ('||typekey||')) AND
+				  (PC.PROGRAM_KEY IN('||cockey||') or -1 in ('||cockey||')) AND
+				   PP.ENTRY_DATE <= TO_DATE('''||endDate||''',''YYYY-MM-DD'') AND
+				   PP.EXIT_DATE >= TO_DATE('''||startDate||''',''YYYY-MM-DD'')) a';
+				   
+	queryDomVio := 'select '||param_cols||' from (select distinct C.CLIENT_KEY as "Client Key",C.FIRST_NAME as "First Name",C.LAST_NAME as "Last Name",C.DATE_OF_BIRTH as "Date Of Birth",(select CR.DESCRIPTION from PATHWAY.PATH_CODE_RACE CR where CR.CODE_KEY = C.RACE_KEY) as "Race",(select CG.GENDER from PATHWAY.PATH_CODE_GENDER CG WHERE CG.CODE_KEY = C.GENDER_KEY) as "Gender",(select CE.DESCRIPTION from PATHWAY.PATH_CODE_ETHNICITY CE where CE.CODE_KEY = C.ETHNICITY_KEY) as "Ethnicity",(select CV.DESCRIPTION from PATHWAY.PATH_CODE_VETERAN CV where CV.CODE_KEY = C.VETERAN) as "Veteran Status",PP.ENTRY_DATE as "Project Entry Date",PP.EXIT_DATE as "Project Exit Date",PP.CREATE_USER_KEY as "Entering User Key"
+					from PATHWAY.PATH_CLIENT C
+					INNER JOIN PATHWAY.PATH_CLIENT_SPECIAL_NEEDS PD ON C.CLIENT_KEY = PD.CLIENT_KEY
+					INNER JOIN PATHWAY.PATH_CLIENT_PROGRAM PP ON C.CLIENT_KEY = PP.CLIENT_KEY
+					INNER JOIN PATHWAY.PATH_CODE_HUD_PROGRAM P ON P.PROGRAM_KEY = PP.PROGRAM_NAME_KEY
+					INNER JOIN PATHWAY.PATH_AGENCY A ON P.AGENCY_KEY = A.AGENCY_KEY
+					INNER JOIN PATHWAY.PATH_CODE_PROGRAM_TYPE PT ON P.PROGRAM_TYPE_KEY = PT.CODE_KEY
+					INNER JOIN PATHWAY.PATH_PROGRAM_COC_LOCATION PC ON PC.PROGRAM_KEY = P.PROGRAM_KEY
+					WHERE PD.NEEDS_CODE_KEY = 21 AND
+					PD.ANSWER_KEY IN ('||code||') AND
+					PP.REC_ACTIVE = ''A'' AND
+				  (A.AGENCY_KEY IN('||akey||') or -1 in ('||akey||')) AND
+				  (P.PROGRAM_KEY IN('||pkey||') or -1 in ('||pkey||')) AND
+				  (PT.CODE_KEY IN('||typekey||') or -1 in ('||typekey||')) AND
+				  (PC.PROGRAM_KEY IN('||cockey||') or -1 in ('||cockey||')) AND
+				   PP.ENTRY_DATE <= TO_DATE('''||endDate||''',''YYYY-MM-DD'') AND
+				   PP.EXIT_DATE >= TO_DATE('''||startDate||''',''YYYY-MM-DD'')) a';
+				   
+	queryChronic := 'select '||param_cols||' from (select distinct C.CLIENT_KEY as "Client Key",C.FIRST_NAME as "First Name",C.LAST_NAME as "Last Name",C.DATE_OF_BIRTH as "Date Of Birth",(select CR.DESCRIPTION from PATHWAY.PATH_CODE_RACE CR where CR.CODE_KEY = C.RACE_KEY) as "Race",(select CG.GENDER from PATHWAY.PATH_CODE_GENDER CG WHERE CG.CODE_KEY = C.GENDER_KEY) as "Gender",(select CE.DESCRIPTION from PATHWAY.PATH_CODE_ETHNICITY CE where CE.CODE_KEY = C.ETHNICITY_KEY) as "Ethnicity",(select CV.DESCRIPTION from PATHWAY.PATH_CODE_VETERAN CV where CV.CODE_KEY = C.VETERAN) as "Veteran Status",PP.ENTRY_DATE as "Project Entry Date",PP.EXIT_DATE as "Project Exit Date",PP.CREATE_USER_KEY as "Entering User Key"
+					from PATHWAY.PATH_CLIENT C
+					INNER JOIN PATHWAY.PATH_CLIENT_SPECIAL_NEEDS PD ON C.CLIENT_KEY = PD.CLIENT_KEY
+					INNER JOIN PATHWAY.PATH_CLIENT_PROGRAM PP ON C.CLIENT_KEY = PP.CLIENT_KEY
+					INNER JOIN PATHWAY.PATH_CODE_HUD_PROGRAM P ON P.PROGRAM_KEY = PP.PROGRAM_NAME_KEY
+					INNER JOIN PATHWAY.PATH_AGENCY A ON P.AGENCY_KEY = A.AGENCY_KEY
+					INNER JOIN PATHWAY.PATH_CODE_PROGRAM_TYPE PT ON P.PROGRAM_TYPE_KEY = PT.CODE_KEY
+					INNER JOIN PATHWAY.PATH_PROGRAM_COC_LOCATION PC ON PC.PROGRAM_KEY = P.PROGRAM_KEY
+					WHERE PD.NEEDS_CODE_KEY = 30 AND
+					PD.ANSWER_KEY IN ('||code||') AND
+					PP.REC_ACTIVE = ''A'' AND
+				  (A.AGENCY_KEY IN('||akey||') or -1 in ('||akey||')) AND
+				  (P.PROGRAM_KEY IN('||pkey||') or -1 in ('||pkey||')) AND
+				  (PT.CODE_KEY IN('||typekey||') or -1 in ('||typekey||')) AND
+				  (PC.PROGRAM_KEY IN('||cockey||') or -1 in ('||cockey||')) AND
+				   PP.ENTRY_DATE <= TO_DATE('''||endDate||''',''YYYY-MM-DD'') AND
+				   PP.EXIT_DATE >= TO_DATE('''||startDate||''',''YYYY-MM-DD'')) a';
+				   
+	queryHIV := 'select '||param_cols||' from (select distinct C.CLIENT_KEY as "Client Key",C.FIRST_NAME as "First Name",C.LAST_NAME as "Last Name",C.DATE_OF_BIRTH as "Date Of Birth",(select CR.DESCRIPTION from PATHWAY.PATH_CODE_RACE CR where CR.CODE_KEY = C.RACE_KEY) as "Race",(select CG.GENDER from PATHWAY.PATH_CODE_GENDER CG WHERE CG.CODE_KEY = C.GENDER_KEY) as "Gender",(select CE.DESCRIPTION from PATHWAY.PATH_CODE_ETHNICITY CE where CE.CODE_KEY = C.ETHNICITY_KEY) as "Ethnicity",(select CV.DESCRIPTION from PATHWAY.PATH_CODE_VETERAN CV where CV.CODE_KEY = C.VETERAN) as "Veteran Status",PP.ENTRY_DATE as "Project Entry Date",PP.EXIT_DATE as "Project Exit Date",PP.CREATE_USER_KEY as "Entering User Key"
+					from PATHWAY.PATH_CLIENT C
+					INNER JOIN PATHWAY.PATH_CLIENT_SPECIAL_NEEDS PD ON C.CLIENT_KEY = PD.CLIENT_KEY
+					INNER JOIN PATHWAY.PATH_CLIENT_PROGRAM PP ON C.CLIENT_KEY = PP.CLIENT_KEY
+					INNER JOIN PATHWAY.PATH_CODE_HUD_PROGRAM P ON P.PROGRAM_KEY = PP.PROGRAM_NAME_KEY
+					INNER JOIN PATHWAY.PATH_AGENCY A ON P.AGENCY_KEY = A.AGENCY_KEY
+					INNER JOIN PATHWAY.PATH_CODE_PROGRAM_TYPE PT ON P.PROGRAM_TYPE_KEY = PT.CODE_KEY
+					INNER JOIN PATHWAY.PATH_PROGRAM_COC_LOCATION PC ON PC.PROGRAM_KEY = P.PROGRAM_KEY
+					WHERE PD.NEEDS_CODE_KEY = 19 AND
+					PD.ANSWER_KEY IN ('||code||') AND					
+					PP.REC_ACTIVE = ''A'' AND
+				  (A.AGENCY_KEY IN('||akey||') or -1 in ('||akey||')) AND
+				  (P.PROGRAM_KEY IN('||pkey||') or -1 in ('||pkey||')) AND
+				  (PT.CODE_KEY IN('||typekey||') or -1 in ('||typekey||')) AND
+				  (PC.PROGRAM_KEY IN('||cockey||') or -1 in ('||cockey||')) AND
+				   PP.ENTRY_DATE <= TO_DATE('''||endDate||''',''YYYY-MM-DD'') AND
+				   PP.EXIT_DATE >= TO_DATE('''||startDate||''',''YYYY-MM-DD'')) a';
+				   
+	querySubstnce := 'select '||param_cols||' from (select distinct C.CLIENT_KEY as "Client Key",C.FIRST_NAME as "First Name",C.LAST_NAME as "Last Name",C.DATE_OF_BIRTH as "Date Of Birth",(select CR.DESCRIPTION from PATHWAY.PATH_CODE_RACE CR where CR.CODE_KEY = C.RACE_KEY) as "Race",(select CG.GENDER from PATHWAY.PATH_CODE_GENDER CG WHERE CG.CODE_KEY = C.GENDER_KEY) as "Gender",(select CE.DESCRIPTION from PATHWAY.PATH_CODE_ETHNICITY CE where CE.CODE_KEY = C.ETHNICITY_KEY) as "Ethnicity",(select CV.DESCRIPTION from PATHWAY.PATH_CODE_VETERAN CV where CV.CODE_KEY = C.VETERAN) as "Veteran Status",PP.ENTRY_DATE as "Project Entry Date",PP.EXIT_DATE as "Project Exit Date",PP.CREATE_USER_KEY as "Entering User Key"
+					from PATHWAY.PATH_CLIENT C
+					INNER JOIN PATHWAY.PATH_CLIENT_SPECIAL_NEEDS PD ON C.CLIENT_KEY = PD.CLIENT_KEY
+					INNER JOIN PATHWAY.PATH_CLIENT_PROGRAM PP ON C.CLIENT_KEY = PP.CLIENT_KEY
+					INNER JOIN PATHWAY.PATH_CODE_HUD_PROGRAM P ON P.PROGRAM_KEY = PP.PROGRAM_NAME_KEY
+					INNER JOIN PATHWAY.PATH_AGENCY A ON P.AGENCY_KEY = A.AGENCY_KEY
+					INNER JOIN PATHWAY.PATH_CODE_PROGRAM_TYPE PT ON P.PROGRAM_TYPE_KEY = PT.CODE_KEY
+					INNER JOIN PATHWAY.PATH_PROGRAM_COC_LOCATION PC ON PC.PROGRAM_KEY = P.PROGRAM_KEY
+					WHERE PD.NEEDS_CODE_KEY = 29 AND
+					PD.ANSWER_KEY IN ('||code||') AND
+					PP.REC_ACTIVE = ''A'' AND
+				  (A.AGENCY_KEY IN('||akey||') or -1 in ('||akey||')) AND
+				  (P.PROGRAM_KEY IN('||pkey||') or -1 in ('||pkey||')) AND
+				  (PT.CODE_KEY IN('||typekey||') or -1 in ('||typekey||')) AND
+				  (PC.PROGRAM_KEY IN('||cockey||') or -1 in ('||cockey||')) AND
+				   PP.ENTRY_DATE <= TO_DATE('''||endDate||''',''YYYY-MM-DD'') AND
+				   PP.EXIT_DATE >= TO_DATE('''||startDate||''',''YYYY-MM-DD'')) a';
+				   
+	queryIncomeEntry := 'select '||param_cols||' from (select distinct C.CLIENT_KEY as "Client Key",C.FIRST_NAME as "First Name",C.LAST_NAME as "Last Name",C.DATE_OF_BIRTH as "Date Of Birth",(select CR.DESCRIPTION from PATHWAY.PATH_CODE_RACE CR where CR.CODE_KEY = C.RACE_KEY) as "Race",(select CG.GENDER from PATHWAY.PATH_CODE_GENDER CG WHERE CG.CODE_KEY = C.GENDER_KEY) as "Gender",(select CE.DESCRIPTION from PATHWAY.PATH_CODE_ETHNICITY CE where CE.CODE_KEY = C.ETHNICITY_KEY) as "Ethnicity",(select CV.DESCRIPTION from PATHWAY.PATH_CODE_VETERAN CV where CV.CODE_KEY = C.VETERAN) as "Veteran Status",PP.ENTRY_DATE as "Project Entry Date",PP.EXIT_DATE as "Project Exit Date",PP.CREATE_USER_KEY as "Entering User Key"
+					from PATHWAY.PATH_CLIENT C
+					INNER JOIN PATHWAY.PATH_CLIENT_PROGRAM PP ON C.CLIENT_KEY = PP.CLIENT_KEY
+					INNER JOIN PATHWAY.PATH_CLIENT_INCOME_CASH CIC ON PP.ENTRY_CASH_GK = CIC.INCOME_GROUP_KEY
+					INNER JOIN PATHWAY.PATH_CODE_HUD_PROGRAM P ON P.PROGRAM_KEY = PP.PROGRAM_NAME_KEY
+					INNER JOIN PATHWAY.PATH_AGENCY A ON P.AGENCY_KEY = A.AGENCY_KEY
+					INNER JOIN PATHWAY.PATH_CODE_PROGRAM_TYPE PT ON P.PROGRAM_TYPE_KEY = PT.CODE_KEY
+					INNER JOIN PATHWAY.PATH_PROGRAM_COC_LOCATION PC ON PC.PROGRAM_KEY = P.PROGRAM_KEY
+					WHERE CIC.VERIFIED_ANSWER IN ('||code||') AND
+					PP.REC_ACTIVE = ''A'' AND
+				  (A.AGENCY_KEY IN('||akey||') or -1 in ('||akey||')) AND
+				  (P.PROGRAM_KEY IN('||pkey||') or -1 in ('||pkey||')) AND
+				  (PT.CODE_KEY IN('||typekey||') or -1 in ('||typekey||')) AND
+				  (PC.PROGRAM_KEY IN('||cockey||') or -1 in ('||cockey||')) AND
+				   PP.ENTRY_DATE <= TO_DATE('''||endDate||''',''YYYY-MM-DD'') AND
+				   PP.EXIT_DATE >= TO_DATE('''||startDate||''',''YYYY-MM-DD'')) a';
+				   
+	queryIncomeExit := 'select '||param_cols||' from (select distinct C.CLIENT_KEY as "Client Key",C.FIRST_NAME as "First Name",C.LAST_NAME as "Last Name",C.DATE_OF_BIRTH as "Date Of Birth",(select CR.DESCRIPTION from PATHWAY.PATH_CODE_RACE CR where CR.CODE_KEY = C.RACE_KEY) as "Race",(select CG.GENDER from PATHWAY.PATH_CODE_GENDER CG WHERE CG.CODE_KEY = C.GENDER_KEY) as "Gender",(select CE.DESCRIPTION from PATHWAY.PATH_CODE_ETHNICITY CE where CE.CODE_KEY = C.ETHNICITY_KEY) as "Ethnicity",(select CV.DESCRIPTION from PATHWAY.PATH_CODE_VETERAN CV where CV.CODE_KEY = C.VETERAN) as "Veteran Status",PP.ENTRY_DATE as "Project Entry Date",PP.EXIT_DATE as "Project Exit Date",PP.CREATE_USER_KEY as "Entering User Key"
+					from PATHWAY.PATH_CLIENT C
+					INNER JOIN PATHWAY.PATH_CLIENT_PROGRAM PP ON C.CLIENT_KEY = PP.CLIENT_KEY
+					INNER JOIN PATHWAY.PATH_CLIENT_INCOME_CASH CIC ON PP.EXIT_CASH_GK = CIC.INCOME_GROUP_KEY
+					INNER JOIN PATHWAY.PATH_CODE_HUD_PROGRAM P ON P.PROGRAM_KEY = PP.PROGRAM_NAME_KEY
+					INNER JOIN PATHWAY.PATH_AGENCY A ON P.AGENCY_KEY = A.AGENCY_KEY
+					INNER JOIN PATHWAY.PATH_CODE_PROGRAM_TYPE PT ON P.PROGRAM_TYPE_KEY = PT.CODE_KEY
+					INNER JOIN PATHWAY.PATH_PROGRAM_COC_LOCATION PC ON PC.PROGRAM_KEY = P.PROGRAM_KEY
+					WHERE CIC.VERIFIED_ANSWER IN ('||code||') AND
+					PP.REC_ACTIVE = ''A'' AND
+				  (A.AGENCY_KEY IN('||akey||') or -1 in ('||akey||')) AND
+				  (P.PROGRAM_KEY IN('||pkey||') or -1 in ('||pkey||')) AND
+				  (PT.CODE_KEY IN('||typekey||') or -1 in ('||typekey||')) AND
+				  (PC.PROGRAM_KEY IN('||cockey||') or -1 in ('||cockey||')) AND 
+				   PP.ENTRY_DATE <= TO_DATE('''||endDate||''',''YYYY-MM-DD'') AND
+				   PP.EXIT_DATE >= TO_DATE('''||startDate||''',''YYYY-MM-DD'')) a';
+				   
+	queryHousingSts := 'select '||param_cols||' from (select distinct C.CLIENT_KEY as "Client Key",C.FIRST_NAME as "First Name",C.LAST_NAME as "Last Name",C.DATE_OF_BIRTH as "Date Of Birth",(select CR.DESCRIPTION from PATHWAY.PATH_CODE_RACE CR where CR.CODE_KEY = C.RACE_KEY) as "Race",(select CG.GENDER from PATHWAY.PATH_CODE_GENDER CG WHERE CG.CODE_KEY = C.GENDER_KEY) as "Gender",(select CE.DESCRIPTION from PATHWAY.PATH_CODE_ETHNICITY CE where CE.CODE_KEY = C.ETHNICITY_KEY) as "Ethnicity",(select CV.DESCRIPTION from PATHWAY.PATH_CODE_VETERAN CV where CV.CODE_KEY = C.VETERAN) as "Veteran Status",PP.ENTRY_DATE as "Project Entry Date",PP.EXIT_DATE as "Project Exit Date",PP.CREATE_USER_KEY as "Entering User Key"
+					from PATHWAY.PATH_CLIENT C
+					INNER JOIN PATHWAY.PATH_CLIENT_PROGRAM PP ON C.CLIENT_KEY = PP.CLIENT_KEY
+								INNER JOIN PATHWAY.PATH_CODE_HOUSING_STATUS CHS ON PP.HOUSING_STATUS_KEY = CHS.CODE_KEY
+								INNER JOIN PATHWAY.PATH_CODE_HUD_PROGRAM P ON P.PROGRAM_KEY = PP.PROGRAM_NAME_KEY
+								INNER JOIN PATHWAY.PATH_AGENCY A ON P.AGENCY_KEY = A.AGENCY_KEY
+								INNER JOIN PATHWAY.PATH_CODE_PROGRAM_TYPE PT ON P.PROGRAM_TYPE_KEY = PT.CODE_KEY
+								INNER JOIN PATHWAY.PATH_PROGRAM_COC_LOCATION PC ON PC.PROGRAM_KEY = P.PROGRAM_KEY
+								WHERE PP.REC_ACTIVE = ''A'' AND
+								CHS.CODE_KEY IN ('||code||') AND
+				  (A.AGENCY_KEY IN('||akey||') or -1 in ('||akey||')) AND
+				  (P.PROGRAM_KEY IN('||pkey||') or -1 in ('||pkey||')) AND
+				  (PT.CODE_KEY IN('||typekey||') or -1 in ('||typekey||')) AND
+				  (PC.PROGRAM_KEY IN('||cockey||') or -1 in ('||cockey||')) AND
+				   PP.ENTRY_DATE <= TO_DATE('''||endDate||''',''YYYY-MM-DD'') AND
+				   PP.EXIT_DATE >= TO_DATE('''||startDate||''',''YYYY-MM-DD'')) a';
+				   
+	queryNonCashEntry := 'select '||param_cols||' from (select distinct C.CLIENT_KEY as "Client Key",C.FIRST_NAME as "First Name",C.LAST_NAME as "Last Name",C.DATE_OF_BIRTH as "Date Of Birth",(select CR.DESCRIPTION from PATHWAY.PATH_CODE_RACE CR where CR.CODE_KEY = C.RACE_KEY) as "Race",(select CG.GENDER from PATHWAY.PATH_CODE_GENDER CG WHERE CG.CODE_KEY = C.GENDER_KEY) as "Gender",(select CE.DESCRIPTION from PATHWAY.PATH_CODE_ETHNICITY CE where CE.CODE_KEY = C.ETHNICITY_KEY) as "Ethnicity",(select CV.DESCRIPTION from PATHWAY.PATH_CODE_VETERAN CV where CV.CODE_KEY = C.VETERAN) as "Veteran Status",PP.ENTRY_DATE as "Project Entry Date",PP.EXIT_DATE as "Project Exit Date",PP.CREATE_USER_KEY as "Entering User Key"
+					from PATHWAY.PATH_CLIENT C
+					INNER JOIN PATHWAY.PATH_CLIENT_PROGRAM PP ON C.CLIENT_KEY = PP.CLIENT_KEY
+							INNER JOIN PATHWAY.PATH_CLIENT_PROGRAM PP ON C.CLIENT_KEY = PP.CLIENT_KEY
+							INNER JOIN PATHWAY.PATH_CLIENT_INCOME_NONCASH CIC ON PP.ENTRY_NONCASH_GK = CIC.NON_CASH_GROUP_KEY
+							INNER JOIN PATHWAY.PATH_CODE_HUD_PROGRAM P ON P.PROGRAM_KEY = PP.PROGRAM_NAME_KEY
+							INNER JOIN PATHWAY.PATH_AGENCY A ON P.AGENCY_KEY = A.AGENCY_KEY
+							INNER JOIN PATHWAY.PATH_CODE_PROGRAM_TYPE PT ON P.PROGRAM_TYPE_KEY = PT.CODE_KEY
+							INNER JOIN PATHWAY.PATH_PROGRAM_COC_LOCATION PC ON PC.PROGRAM_KEY = P.PROGRAM_KEY
+							WHERE PP.REC_ACTIVE = ''A'' AND
+								CIC.VERIFIED_ANSWER IN ('||code||') AND
+				  (A.AGENCY_KEY IN('||akey||') or -1 in ('||akey||')) AND
+				  (P.PROGRAM_KEY IN('||pkey||') or -1 in ('||pkey||')) AND
+				  (PT.CODE_KEY IN('||typekey||') or -1 in ('||typekey||')) AND
+				  (PC.PROGRAM_KEY IN('||cockey||') or -1 in ('||cockey||')) AND
+				   PP.ENTRY_DATE <= TO_DATE('''||endDate||''',''YYYY-MM-DD'') AND
+				   PP.EXIT_DATE >= TO_DATE('''||startDate||''',''YYYY-MM-DD'')) a';
+				   
+	queryNonCashExit := 'select '||param_cols||' from (select distinct C.CLIENT_KEY as "Client Key",C.FIRST_NAME as "First Name",C.LAST_NAME as "Last Name",C.DATE_OF_BIRTH as "Date Of Birth",(select CR.DESCRIPTION from PATHWAY.PATH_CODE_RACE CR where CR.CODE_KEY = C.RACE_KEY) as "Race",(select CG.GENDER from PATHWAY.PATH_CODE_GENDER CG WHERE CG.CODE_KEY = C.GENDER_KEY) as "Gender",(select CE.DESCRIPTION from PATHWAY.PATH_CODE_ETHNICITY CE where CE.CODE_KEY = C.ETHNICITY_KEY) as "Ethnicity",(select CV.DESCRIPTION from PATHWAY.PATH_CODE_VETERAN CV where CV.CODE_KEY = C.VETERAN) as "Veteran Status",PP.ENTRY_DATE as "Project Entry Date",PP.EXIT_DATE as "Project Exit Date",PP.CREATE_USER_KEY as "Entering User Key"
+					from PATHWAY.PATH_CLIENT C
+					INNER JOIN PATHWAY.PATH_CLIENT_PROGRAM PP ON C.CLIENT_KEY = PP.CLIENT_KEY
+							INNER JOIN PATHWAY.PATH_CLIENT_INCOME_NONCASH CIC ON PP.EXIT_NONCASH_GK = CIC.NON_CASH_GROUP_KEY
+							INNER JOIN PATHWAY.PATH_CODE_HUD_PROGRAM P ON P.PROGRAM_KEY = PP.PROGRAM_NAME_KEY
+							INNER JOIN PATHWAY.PATH_AGENCY A ON P.AGENCY_KEY = A.AGENCY_KEY
+							INNER JOIN PATHWAY.PATH_CODE_PROGRAM_TYPE PT ON P.PROGRAM_TYPE_KEY = PT.CODE_KEY
+							INNER JOIN PATHWAY.PATH_PROGRAM_COC_LOCATION PC ON PC.PROGRAM_KEY = P.PROGRAM_KEY
+							WHERE PP.REC_ACTIVE = ''A'' AND
+					CIC.VERIFIED_ANSWER IN ('||code||') AND
+				  (A.AGENCY_KEY IN('||akey||') or -1 in ('||akey||')) AND
+				  (P.PROGRAM_KEY IN('||pkey||') or -1 in ('||pkey||')) AND
+				  (PT.CODE_KEY IN('||typekey||') or -1 in ('||typekey||')) AND
+				  (PC.PROGRAM_KEY IN('||cockey||') or -1 in ('||cockey||')) AND
+				   PP.ENTRY_DATE <= TO_DATE('''||endDate||''',''YYYY-MM-DD'') AND
+				   PP.EXIT_DATE >= TO_DATE('''||startDate||''',''YYYY-MM-DD'')) a';
+				   
+	queryZip := 'select '||param_cols||' from (select distinct C.CLIENT_KEY as "Client Key",C.FIRST_NAME as "First Name",C.LAST_NAME as "Last Name",C.DATE_OF_BIRTH as "Date Of Birth",(select CR.DESCRIPTION from PATHWAY.PATH_CODE_RACE CR where CR.CODE_KEY = C.RACE_KEY) as "Race",(select CG.GENDER from PATHWAY.PATH_CODE_GENDER CG WHERE CG.CODE_KEY = C.GENDER_KEY) as "Gender",(select CE.DESCRIPTION from PATHWAY.PATH_CODE_ETHNICITY CE where CE.CODE_KEY = C.ETHNICITY_KEY) as "Ethnicity",(select CV.DESCRIPTION from PATHWAY.PATH_CODE_VETERAN CV where CV.CODE_KEY = C.VETERAN) as "Veteran Status",PP.ENTRY_DATE as "Project Entry Date",PP.EXIT_DATE as "Project Exit Date",PP.CREATE_USER_KEY as "Entering User Key"
+					from PATHWAY.PATH_CLIENT C
+					INNER JOIN PATHWAY.PATH_CLIENT_PROGRAM PP ON C.CLIENT_KEY = PP.CLIENT_KEY
+								INNER JOIN PATHWAY.PATH_CLIENT_CHRONIC_HOMELESS CCH ON C.CLIENT_KEY = CCH.CLIENT_KEY
+								INNER JOIN PATHWAY.PATH_CODE_HUD_PROGRAM P ON P.PROGRAM_KEY = PP.PROGRAM_NAME_KEY
+								INNER JOIN PATHWAY.PATH_AGENCY A ON P.AGENCY_KEY = A.AGENCY_KEY
+								INNER JOIN PATHWAY.PATH_CODE_PROGRAM_TYPE PT ON P.PROGRAM_TYPE_KEY = PT.CODE_KEY
+								INNER JOIN PATHWAY.PATH_PROGRAM_COC_LOCATION PC ON PC.PROGRAM_KEY = P.PROGRAM_KEY
+								WHERE PP.REC_ACTIVE = ''A'' AND
+					CCH.ZIPCODE_LAST_PERM_ADDRESS IN ('||code||') AND
+				  (A.AGENCY_KEY IN('||akey||') or -1 in ('||akey||')) AND
+				  (P.PROGRAM_KEY IN('||pkey||') or -1 in ('||pkey||')) AND
+				  (PT.CODE_KEY IN('||typekey||') or -1 in ('||typekey||')) AND
+				  (PC.PROGRAM_KEY IN('||cockey||') or -1 in ('||cockey||')) AND
+				   PP.ENTRY_DATE <= TO_DATE('''||endDate||''',''YYYY-MM-DD'') AND
+				   PP.EXIT_DATE >= TO_DATE('''||startDate||''',''YYYY-MM-DD'')) a';
+				   
+	queryRes := 'select '||param_cols||' from (select distinct C.CLIENT_KEY as "Client Key",C.FIRST_NAME as "First Name",C.LAST_NAME as "Last Name",C.DATE_OF_BIRTH as "Date Of Birth",(select CR.DESCRIPTION from PATHWAY.PATH_CODE_RACE CR where CR.CODE_KEY = C.RACE_KEY) as "Race",(select CG.GENDER from PATHWAY.PATH_CODE_GENDER CG WHERE CG.CODE_KEY = C.GENDER_KEY) as "Gender",(select CE.DESCRIPTION from PATHWAY.PATH_CODE_ETHNICITY CE where CE.CODE_KEY = C.ETHNICITY_KEY) as "Ethnicity",(select CV.DESCRIPTION from PATHWAY.PATH_CODE_VETERAN CV where CV.CODE_KEY = C.VETERAN) as "Veteran Status",PP.ENTRY_DATE as "Project Entry Date",PP.EXIT_DATE as "Project Exit Date",PP.CREATE_USER_KEY as "Entering User Key"
+					from PATHWAY.PATH_CLIENT C
+					INNER JOIN PATHWAY.PATH_CLIENT_PROGRAM PP ON C.CLIENT_KEY = PP.CLIENT_KEY
+								INNER JOIN PATHWAY.PATH_CLIENT_CHRONIC_HOMELESS CCH ON C.CLIENT_KEY = CCH.CLIENT_KEY
+								INNER JOIN PATHWAY.PATH_CODE_HUD_PROGRAM P ON P.PROGRAM_KEY = PP.PROGRAM_NAME_KEY
+								INNER JOIN PATHWAY.PATH_AGENCY A ON P.AGENCY_KEY = A.AGENCY_KEY
+								INNER JOIN PATHWAY.PATH_CODE_PROGRAM_TYPE PT ON P.PROGRAM_TYPE_KEY = PT.CODE_KEY
+								INNER JOIN PATHWAY.PATH_PROGRAM_COC_LOCATION PC ON PC.PROGRAM_KEY = P.PROGRAM_KEY
+							WHERE PP.REC_ACTIVE = ''A'' AND
+					CCH.PRIOR_NIGHTS_RESIDENCE_KEY IN ('||code||') AND
+				  (A.AGENCY_KEY IN('||akey||') or -1 in ('||akey||')) AND
+				  (P.PROGRAM_KEY IN('||pkey||') or -1 in ('||pkey||')) AND
+				  (PT.CODE_KEY IN('||typekey||') or -1 in ('||typekey||')) AND
+				  (PC.PROGRAM_KEY IN('||cockey||') or -1 in ('||cockey||')) AND
+				   PP.ENTRY_DATE <= TO_DATE('''||endDate||''',''YYYY-MM-DD'') AND
+				   PP.EXIT_DATE >= TO_DATE('''||startDate||''',''YYYY-MM-DD'')) a';
+				   
+		IF(INSTR(rowId,'Race') > 0) THEN
+        innerQuery := innerQuery || queryRace;
+	END IF;
+						   
+	IF(INSTR(rowId,'Gender') > 0) THEN					   
+		IF(innerQuery is null) THEN
+            innerQuery := innerQuery || queryGender;
+        ELSE
+            innerQuery := innerQuery || ' UNION ALL ' || queryGender;
+        END IF;
+	END IF;
+	
+		IF(INSTR(rowId,'Ethnicity') > 0) THEN					   
+		IF(innerQuery is null) THEN
+            innerQuery := innerQuery || queryEthnicity;
+        ELSE
+            innerQuery := innerQuery || ' UNION ALL ' || queryEthnicity;
+        END IF;
+	END IF;
+	
+		IF(INSTR(rowId,'Veteran') > 0) THEN					   
+		IF(innerQuery is null) THEN
+            innerQuery := innerQuery || queryVeteran;
+        ELSE
+            innerQuery := innerQuery || ' UNION ALL ' || queryVeteran;
+        END IF;
+	END IF;
+	
+		IF(INSTR(rowId,'Fname') > 0) THEN					   
+		IF(innerQuery is null) THEN
+            innerQuery := innerQuery || queryFname;
+        ELSE
+            innerQuery := innerQuery || ' UNION ALL ' || queryFname;
+        END IF;
+	END IF;
+	
+		IF(INSTR(rowId,'Lname') > 0) THEN					   
+		IF(innerQuery is null) THEN
+            innerQuery := innerQuery || queryLname;
+        ELSE
+            innerQuery := innerQuery || ' UNION ALL ' || queryLname;
+        END IF;
+	END IF;
+	
+		IF(INSTR(rowId,'Dob') > 0) THEN					   
+		IF(innerQuery is null) THEN
+            innerQuery := innerQuery || queryDob;
+        ELSE
+            innerQuery := innerQuery || ' UNION ALL ' || queryDob;
+        END IF;
+	END IF;
+	
+		IF(INSTR(rowId,'Physical') > 0) THEN					   
+		IF(innerQuery is null) THEN
+            innerQuery := innerQuery || queryPhyDis;
+        ELSE
+            innerQuery := innerQuery || ' UNION ALL ' || queryPhyDis;
+        END IF;
+	END IF;
+	
+		IF(INSTR(rowId,'Domestic') > 0) THEN					   
+		IF(innerQuery is null) THEN
+            innerQuery := innerQuery || queryDomVio;
+        ELSE
+            innerQuery := innerQuery || ' UNION ALL ' || queryDomVio;
+        END IF;
+	END IF;
+	
+		IF(INSTR(rowId,'Substance') > 0) THEN					   
+		IF(innerQuery is null) THEN
+            innerQuery := innerQuery || querySubstnce;
+        ELSE
+            innerQuery := innerQuery || ' UNION ALL ' || querySubstnce;
+        END IF;
+	END IF;
+	
+		IF(INSTR(rowId,'Mental') > 0) THEN					   
+		IF(innerQuery is null) THEN
+            innerQuery := innerQuery || queryMntlHlth;
+        ELSE
+            innerQuery := innerQuery || ' UNION ALL ' || queryMntlHlth;
+        END IF;
+	END IF;
+	
+		IF(INSTR(rowId,'Chronic') > 0) THEN					   
+		IF(innerQuery is null) THEN
+            innerQuery := innerQuery || queryChronic;
+        ELSE
+            innerQuery := innerQuery || ' UNION ALL ' || queryChronic;
+        END IF;
+	END IF;
+	
+		IF(INSTR(rowId,'Entry') > 0) THEN					   
+		IF(innerQuery is null) THEN
+            innerQuery := innerQuery || queryIncomeEntry;
+        ELSE
+            innerQuery := innerQuery || ' UNION ALL ' || queryIncomeEntry;
+        END IF;
+	END IF;
+	
+		IF(INSTR(rowId,'Exit') > 0) THEN					   
+		IF(innerQuery is null) THEN
+            innerQuery := innerQuery || queryIncomeExit;
+        ELSE
+            innerQuery := innerQuery || ' UNION ALL ' || queryIncomeExit;
+        END IF;
+	END IF;
+	
+	IF(INSTR(rowId,'HIV') > 0) THEN					   
+		IF(innerQuery is null) THEN
+            innerQuery := innerQuery || queryHIV;
+        ELSE
+            innerQuery := innerQuery || ' UNION ALL ' || queryHIV;
+        END IF;
+	END IF;
+	
+	IF(INSTR(rowId,'Non-cash Benefits At Entry') > 0) THEN
+		IF(innerQuery is null) THEN
+            innerQuery := innerQuery || queryNonCashEntry;
+        ELSE
+            innerQuery := innerQuery || ' UNION ALL ' || queryNonCashEntry;
+        END IF;
+	END IF;
+	
+		IF(INSTR(rowId,'Non-cash Benefits At Exit') > 0) THEN
+		IF(innerQuery is null) THEN
+            innerQuery := innerQuery || queryNonCashExit;
+        ELSE
+            innerQuery := innerQuery || ' UNION ALL ' || queryNonCashExit;
+        END IF;
+	END IF;
+	
+		IF(INSTR(rowId,'Housing Status') > 0) THEN
+		IF(innerQuery is null) THEN
+            innerQuery := innerQuery || queryHousingSts;
+        ELSE
+            innerQuery := innerQuery || ' UNION ALL ' || queryHousingSts;
+        END IF;
+	END IF;
+	
+		IF(INSTR(rowId,'Zip Of Last Perm Address') > 0) THEN
+		IF(innerQuery is null) THEN
+            innerQuery := innerQuery || queryZip;
+        ELSE
+            innerQuery := innerQuery || ' UNION ALL ' || queryZip;
+        END IF;
+	END IF;
+	
+		IF(INSTR(rowId,'Residence Prior To Entry') > 0) THEN
+		IF(innerQuery is null) THEN
+            innerQuery := innerQuery || queryRes;
+        ELSE
+            innerQuery := innerQuery || ' UNION ALL ' || queryRes;
+        END IF;
+	END IF;
 
-		set queryLastName = CONCAT('select ',a,' from (select \'\' as \'Client Key\',\'\' as \'First Name\',\'\' as \'Last Name\',\'\' as \'Project Entry Date\',\'\' as \'Entering User Key\',\'\' as \'Project Exit Date\',\'\' as Gender,\'\' as Ethnicity,\'\' as \'Veteran Status\',\'\' as Race,\'\' as \'Date Of Birth\') b');
-		
-		set queryRes = CONCAT('select ',a,' from (select \'\' as \'Client Key\',\'\' as \'First Name\',\'\' as \'Last Name\',\'\' as \'Project Entry Date\',\'\' as \'Entering User Key\',\'\' as \'Project Exit Date\',\'\' as Gender,\'\' as Ethnicity,\'\' as \'Veteran Status\',\'\' as Race,\'\' as \'Date Of Birth\') b');
-		
-		set queryZip = CONCAT('select ',a,' from (select \'\' as \'Client Key\',\'\' as \'First Name\',\'\' as \'Last Name\',\'\' as \'Project Entry Date\',\'\' as \'Entering User Key\',\'\' as \'Project Exit Date\',\'\' as Gender,\'\' as Ethnicity,\'\' as \'Veteran Status\',\'\' as Race,\'\' as \'Date Of Birth\') b');
-		
-		set queryIncomeEntry = CONCAT('select ',a,' from (select \'\' as \'Client Key\',\'\' as \'First Name\',\'\' as \'Last Name\',\'\' as \'Project Entry Date\',\'\' as \'Entering User Key\',\'\' as \'Project Exit Date\',\'\' as Gender,\'\' as Ethnicity,\'\' as \'Veteran Status\',\'\' as Race,\'\' as \'Date Of Birth\') b');
-		
-		set queryIncomeExit = CONCAT('select ',a,' from (select \'\' as \'Client Key\',\'\' as \'First Name\',\'\' as \'Last Name\',\'\' as \'Project Entry Date\',\'\' as \'Entering User Key\',\'\' as \'Project Exit Date\',\'\' as Gender,\'\' as Ethnicity,\'\' as \'Veteran Status\',\'\' as Race,\'\' as \'Date Of Birth\') b');
-		
-		set queryBenefitsEntry = CONCAT('select ',a,' from (select \'\' as \'Client Key\',\'\' as \'First Name\',\'\' as \'Last Name\',\'\' as \'Project Entry Date\',\'\' as \'Entering User Key\',\'\' as \'Project Exit Date\',\'\' as Gender,\'\' as Ethnicity,\'\' as \'Veteran Status\',\'\' as Race,\'\' as \'Date Of Birth\') b');
-		
-		set queryBenefitsExit = CONCAT('select ',a,' from (select \'\' as \'Client Key\',\'\' as \'First Name\',\'\' as \'Last Name\',\'\' as \'Project Entry Date\',\'\' as \'Entering User Key\',\'\' as \'Project Exit Date\',\'\' as Gender,\'\' as Ethnicity,\'\' as \'Veteran Status\',\'\' as Race,\'\' as \'Date Of Birth\') b');
-	  
-	  IF(INSTR(rowId,'Race')) THEN
-          set innerQuery = CONCAT(innerQuery,queryRace);
-
-      END IF;
-	  
-	  IF(INSTR(rowId, 'Gender')) THEN
-          IF(LENGTH(innerQuery)=0) THEN
-            set innerQuery = CONCAT(innerquery,queryGender);
-          ELSE
-          set innerQuery = CONCAT(innerquery,' UNION ',queryGender);
-          END IF;
-
-     END IF;
-	  
-	  IF(INSTR(rowId, 'Ethnicity')) THEN
-          IF(LENGTH(innerQuery)=0) THEN
-            set innerQuery = CONCAT(innerQuery,queryEthnicity);
-          ELSE
-          set innerQuery = CONCAT(innerQuery,' UNION ALL ',queryEthnicity);
-          END IF;
-
-     END IF;
-	 
-	 IF(INSTR(rowId, 'Veteran Status')) THEN
-          IF(LENGTH(innerQuery)=0) THEN
-            set innerQuery = CONCAT(innerquery,queryVetSts);
-          ELSE
-          set innerQuery = CONCAT(innerquery,' UNION ',queryVetSts);
-          END IF;
-
-     END IF;
-	 
-	 IF(INSTR(rowId, 'Physical Disability')) THEN
-          IF(LENGTH(innerQuery)=0) THEN
-            set innerQuery = CONCAT(innerquery,queryPhyDis);
-          ELSE
-          set innerQuery = CONCAT(innerquery,' UNION ALL ',queryPhyDis);
-          END IF;
-
-     END IF;
-
-     IF(INSTR(rowId, 'Chronic Health Condition')) THEN
-          IF(LENGTH(innerQuery)=0) THEN
-            set innerQuery = CONCAT(innerquery,queryChronicHltCond);
-          ELSE
-          set innerQuery = CONCAT(innerquery,' UNION ALL ',queryChronicHltCond);
-          END IF;
-
-     END IF;
-
-    IF(INSTR(rowId, 'HIV/AIDS')) THEN
-          IF(LENGTH(innerQuery)=0) THEN
-            set innerQuery = CONCAT(innerquery,queryHivAids);
-          ELSE
-          set innerQuery = CONCAT(innerquery,' UNION ALL ',queryHivAids);
-          END IF;
-
-     END IF;
-	 
-	 IF(INSTR(rowId, 'Mental Health')) THEN
-          IF(LENGTH(innerQuery)=0) THEN
-            set innerQuery = CONCAT(innerquery,queryMentlHlth);
-          ELSE
-          set innerQuery = CONCAT(innerquery,' UNION ',queryMentlHlth);
-          END IF;
-
-     END IF;
-
-    IF(INSTR(rowId, 'Substance Abuse')) THEN
-          IF(LENGTH(innerQuery)=0) THEN
-            set innerQuery = CONCAT(innerquery,querySubstncAbs);
-          ELSE
-          set innerQuery = CONCAT(innerquery,' UNION ',querySubstncAbs);
-          END IF;
-
-     END IF;
-
-    IF(INSTR(rowId, 'Domestic Violence')) THEN
-          IF(LENGTH(innerQuery)=0) THEN
-            set innerQuery = CONCAT(innerquery,queryDomstcViolnc);
-          ELSE
-          set innerQuery = CONCAT(innerquery,' UNION ',queryDomstcViolnc);
-          END IF;
-
-     END IF;
-
-    IF(INSTR(rowId, 'Housing Status')) THEN
-          IF(LENGTH(innerQuery)=0) THEN
-            set innerQuery = CONCAT(innerquery,queryHousngSts);
-          ELSE
-          set innerQuery = CONCAT(innerquery,' UNION ',queryHousngSts);
-          END IF;
-
-     END IF;
-
-    IF(INSTR(rowId, 'Date Of Birth')) THEN
-          IF(LENGTH(innerQuery)=0) THEN
-            set innerQuery = CONCAT(innerquery,queryDateOfBirth);
-          ELSE
-          set innerQuery = CONCAT(innerquery,' UNION ',queryDateOfBirth);
-          END IF;
-
-     END IF;
-     
-     	   IF(INSTR(rowId,'First Name')) THEN
-     		IF(LENGTH(innerQuery)=0) THEN
-            set innerQuery = CONCAT(innerquery,queryFirstName);
-          ELSE
-          set innerQuery = CONCAT(innerquery,' UNION ',queryFirstName);
-          END IF;
-
-     END IF;
-     
-     IF(INSTR(rowId,'Last Name')) THEN
-     		IF(LENGTH(innerQuery)=0) THEN
-            set innerQuery = CONCAT(innerquery,queryLastName);
-          ELSE
-          set innerQuery = CONCAT(innerquery,' UNION ',queryLastName);
-          END IF;
-
-     END IF;
-     
-     IF(INSTR(rowId,'Residence Prior To Entry')) THEN
-     		IF(LENGTH(innerQuery)=0) THEN
-            set innerQuery = CONCAT(innerquery,queryRes);
-          ELSE
-          set innerQuery = CONCAT(innerquery,' UNION ',queryRes);
-          END IF;
-
-     END IF;
-     
-     IF(INSTR(rowId,'Zip Of Last Perm Residence')) THEN
-     		IF(LENGTH(innerQuery)=0) THEN
-            set innerQuery = CONCAT(innerquery,queryZip);
-          ELSE
-          set innerQuery = CONCAT(innerquery,' UNION ',queryZip);
-          END IF;
-
-     END IF;
-     
-     IF(INSTR(rowId,'Income(At Entry)')) THEN
-     		IF(LENGTH(innerQuery)=0) THEN
-            set innerQuery = CONCAT(innerquery,queryIncomeEntry);
-          ELSE
-          set innerQuery = CONCAT(innerquery,' UNION ',queryIncomeEntry);
-          END IF;
-
-     END IF;
-     
-     IF(INSTR(rowId,'Income(At Exit)')) THEN
-     		IF(LENGTH(innerQuery)=0) THEN
-            set innerQuery = CONCAT(innerquery,queryIncomeExit);
-          ELSE
-          set innerQuery = CONCAT(innerquery,' UNION ',queryIncomeExit);
-          END IF;
-
-     END IF;
-     
-     IF(INSTR(rowId,'Non-cash Benefits(At Entry)')) THEN
-     		IF(LENGTH(innerQuery)=0) THEN
-            set innerQuery = CONCAT(innerquery,queryBenefitsEntry);
-          ELSE
-          set innerQuery = CONCAT(innerquery,' UNION ',queryBenefitsEntry);
-          END IF;
-
-     END IF;
-     
-     IF(INSTR(rowId,'Non-cash Benefits(At Exit)')) THEN
-     		IF(LENGTH(innerQuery)=0) THEN
-            set innerQuery = CONCAT(innerquery,queryBenefitsExit);
-          ELSE
-          set innerQuery = CONCAT(innerquery,' UNION ',queryBenefitsExit);
-          END IF;
-
-     END IF;
-     
-     IF(INSTR(rowId,'ALL')) THEN
-     			set innerQuery = CONCAT(innerQuery,queryRace,' UNION ',queryGender,' UNION ',queryEthnicity,' UNION ',queryVetSts,' UNION ',queryPhyDis,' UNION ',queryChronicHltCond,' UNION ',queryHivAids,' UNION ',queryMentlHlth,' UNION ',querySubstncAbs,' UNION ',queryDomstcViolnc,' UNION ',queryHousngSts,' UNION ',queryDateOfBirth,' UNION ',queryFirstName,' UNION ',queryLastName,' UNION ',queryZip,' UNION ',queryRes,' UNION ',queryIncomeEntry,' UNION ',queryIncomeExit,' UNION ',queryBenefitsEntry,' UNION ',queryBenefitsExit);
-     	END IF;
-
-	 set @Query = CONCAT('select * from (',innerQuery,') a');
-      --  select innerQuery;
-       prepare b from @Query;
-       execute b;
-END//
-DELIMITER ;
-/*!40101 SET SQL_MODE=IFNULL(@OLD_SQL_MODE, '') */;
-/*!40014 SET FOREIGN_KEY_CHECKS=IF(@OLD_FOREIGN_KEY_CHECKS IS NULL, 1, @OLD_FOREIGN_KEY_CHECKS) */;
-/*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
+	IF(INSTR(rowId,'ALL') > 0) THEN
+	
+		innerQuery := queryRace || ' UNION ALL ' || queryGender || ' UNION ALL ' || queryEthnicity  || ' UNION ALL ' ||  queryVeteran || ' UNION ALL ' || queryFname || ' UNION ALL ' || queryLname || ' UNION ALL ' || queryDob || ' UNION ALL ' || queryPhyDis || ' UNION ALL ' || queryDomVio || ' UNION ALL ' || queryChronic || ' UNION ALL ' || queryMntlHlth || ' UNION ALL ' || queryHIV || ' UNION ALL ' || querySubstnce || ' UNION ALL ' || queryIncomeEntry || ' UNION ALL ' || queryIncomeExit;
+				   
+	END IF;
+	OPEN cur FOR innerQuery;
+				   
+END;
+/
